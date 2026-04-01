@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LorHels Presta - Sistema de Préstamos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        .seccion-oculta { display: none !important; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        #app-container { height: 100vh; display: flex; overflow: hidden; }
+        #login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-900 overflow-hidden">
+
+    <div id="login-container">
+        <div class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-md border border-gray-100 relative">
+            
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-4">
+                    <i data-lucide="shield-check" class="text-blue-600 w-8 h-8"></i>
+                </div>
+                <h1 class="text-3xl font-bold text-gray-900">LorHels Presta</h1>
+                <p class="text-gray-500 mt-2">Acceso al Sistema</p>
+            </div>
+
+            <form id="form-login" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="mail" class="text-gray-400 w-5 h-5"></i>
+                        </div>
+                        <input type="email" id="login-email" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin@lorhels.com" required>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="lock" class="text-gray-400 w-5 h-5"></i>
+                        </div>
+                        <input type="password" id="login-password" class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="••••••••" required>
+                    </div>
+                </div>
+                
+                <p id="mensaje-error" class="text-red-500 text-sm text-center seccion-oculta"></p>
+                <p id="mensaje-exito" class="text-green-600 text-sm text-center seccion-oculta"></p>
+
+                <button type="submit" id="btn-submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition font-medium flex justify-center items-center">
+                    <span>Iniciar Sesión</span>
+                </button>
+            </form>
+
+            <div class="mt-6 pt-4 border-t border-gray-100 text-center">
+                <button type="button" onclick="crearAdminInicial()" class="text-xs text-blue-500 hover:text-blue-700 underline">
+                    (Configuración) Crear mi cuenta Admin inicial
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="seccion-oculta">
+        
+        <aside class="w-64 bg-gray-900 text-white flex flex-col h-full z-10 flex-shrink-0">
+            <div class="p-6 border-b border-gray-800">
+                <h1 class="text-xl font-bold text-blue-400 truncate">LorHels Presta</h1>
+                <div class="mt-4 flex items-center p-2 bg-gray-800 rounded-lg">
+                    <div id="icono-rol" class="p-2 bg-gray-700 rounded-full mr-3">
+                        <i data-lucide="user" class="w-4 h-4"></i>
+                    </div>
+                    <div class="overflow-hidden">
+                        <p id="nombre-usuario" class="text-sm font-semibold truncate">Cargando...</p>
+                        <p id="rol-usuario-texto" class="text-xs text-blue-300 font-medium uppercase tracking-wide">Rol</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav id="menu-navegacion" class="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+                </nav>
+
+            <div class="p-4 border-t border-gray-800">
+                <button onclick="cerrarSesionApp()" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-red-400 hover:bg-gray-800 hover:text-red-300 transition-colors">
+                    <i data-lucide="log-out"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto h-full p-6 bg-gray-50 flex flex-col items-center justify-start" id="main-content">
+            
+            <div id="vista-dashboard" class="w-full max-w-4xl text-center mt-10 fade-in">
+                <i data-lucide="check-circle" class="w-20 h-20 text-green-500 mx-auto mb-4"></i>
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">¡Bienvenido a LorHels Presta!</h2>
+                <p class="text-gray-600">Has entrado a la base de datos real de Firebase.</p>
+                <p id="bienvenida-rol" class="mt-4 font-medium text-blue-600 bg-blue-50 py-2 px-4 rounded-lg inline-block"></p>
+            </div>
+
+            <div id="vista-clientes" class="w-full max-w-4xl seccion-oculta fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Clientes</h2>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2">Registrar Nuevo Cliente</h3>
+                    <form id="form-cliente" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                                <input type="text" id="cliente-nombre" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Identificación (Cédula/DNI)</label>
+                                <input type="text" id="cliente-identificacion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                <input type="tel" id="cliente-telefono" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                                <input type="email" id="cliente-correo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                                <input type="text" id="cliente-direccion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-guardar-cliente" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center space-x-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            <span>Guardar Cliente</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYcO3Fwlb4Bktm2-4qyTIQjM0a-qk-koc",
+            authDomain: "lorhels-presta.firebaseapp.com",
+            projectId: "lorhels-presta",
+            storageBucket: "lorhels-presta.firebasestorage.app",
+            messagingSenderId: "414430605308",
+            appId: "1:414430605308:web:caee3b944aae5d83b4cc79"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        lucide.createIcons();
+
+        // ELEMENTOS DEL DOM
+        const formLogin = document.getElementById('form-login');
+        const msjError = document.getElementById('mensaje-error');
+        const msjExito = document.getElementById('mensaje-exito');
+
+        // --- 1. INICIAR SESIÓN ---
+        formLogin.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const btnSubmit = document.getElementById('btn-submit');
+
+            msjError.classList.add('seccion-oculta');
+            btnSubmit.innerHTML = 'Conectando...';
+            btnSubmit.disabled = true;
+
+            try {
+                const credenciales = await signInWithEmailAndPassword(auth, email, password);
+                const docUsuario = await getDoc(doc(db, "usuarios", credenciales.user.uid));
+                
+                if (docUsuario.exists()) {
+                    const datosUsuario = docUsuario.data();
+                    mostrarApp(datosUsuario.rol, datosUsuario.nombre);
+                } else {
+                    throw new Error("El usuario existe, pero no tiene rol asignado.");
+                }
+            } catch (error) {
+                console.error(error);
+                msjError.innerText = "Error: Verifica tu correo y contraseña. (" + error.message + ")";
+                msjError.classList.remove('seccion-oculta');
+            } finally {
+                btnSubmit.innerHTML = 'Iniciar Sesión';
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // --- 2. CREAR PRIMER ADMIN ---
+        window.crearAdminInicial = async () => {
+            const email = prompt("Ingresa el correo para el nuevo Administrador:");
+            const password = prompt("Ingresa una contraseña (mínimo 6 caracteres):");
+            const nombre = prompt("Ingresa tu nombre completo:");
+
+            if(!email || !password || !nombre) return;
+
+            try {
+                const credenciales = await createUserWithEmailAndPassword(auth, email, password);
+                
+                await setDoc(doc(db, "usuarios", credenciales.user.uid), {
+                    nombre: nombre,
+                    email: email,
+                    rol: "admin",
+                    fechaCreacion: new Date()
+                });
+
+                msjExito.innerText = "¡Cuenta creada! Ahora puedes iniciar sesión.";
+                msjExito.classList.remove('seccion-oculta');
+                document.getElementById('login-email').value = email;
+            } catch (error) {
+                alert("Hubo un error: " + error.message);
+                console.error(error);
+            }
+        };
+
+        // --- 3. CERRAR SESIÓN ---
+        window.cerrarSesionApp = async () => {
+            await signOut(auth);
+            document.getElementById('app-container').classList.add('seccion-oculta');
+            document.getElementById('login-container').classList.remove('seccion-oculta');
+            document.getElementById('login-password').value = '';
+        };
+
+        // --- 4. NAVEGACIÓN ENTRE VISTAS ---
+        window.cambiarVista = (vistaDestino) => {
+            document.getElementById('vista-dashboard').classList.add('seccion-oculta');
+            document.getElementById('vista-clientes').classList.add('seccion-oculta');
+            document.getElementById(`vista-${vistaDestino}`).classList.remove('seccion-oculta');
+        };
+
+        // --- 5. MOSTRAR APLICACIÓN Y MENÚ ---
+        function mostrarApp(rol, nombre) {
+            document.getElementById('login-container').classList.add('seccion-oculta');
+            document.getElementById('app-container').classList.remove('seccion-oculta');
+            document.getElementById('nombre-usuario').innerText = nombre;
+            document.getElementById('rol-usuario-texto').innerText = rol;
+            document.getElementById('bienvenida-rol').innerText = `Tu nivel de acceso actual es: ${rol.toUpperCase()}`;
+
+            let iconoStr = rol === 'admin' ? 'crown' : (rol === 'cobrador' ? 'briefcase' : 'user');
+            document.getElementById('icono-rol').innerHTML = `<i data-lucide="${iconoStr}" class="w-4 h-4 text-white"></i>`;
+            lucide.createIcons();
+
+            const menuNavegacion = document.getElementById('menu-navegacion');
+            let htmlMenu = '';
+            
+            if(rol === 'admin') {
+                htmlMenu += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></button>`;
+                htmlMenu += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="users" class="w-5 h-5"></i><span>Clientes</span></button>`;
+                htmlMenu += `<button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="banknotes" class="w-5 h-5"></i><span>Préstamos</span></button>`;
+            }
+            
+            menuNavegacion.innerHTML = htmlMenu;
+            lucide.createIcons(); // Recargar iconos del menú
+        }
+
+        // --- 6. GUARDAR NUEVO CLIENTE ---
+        const formCliente = document.getElementById('form-cliente');
+        formCliente.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnGuardar = document.getElementById('btn-guardar-cliente');
+            btnGuardar.innerText = 'Guardando...';
+            btnGuardar.disabled = true;
+
+            // Recopilamos todos los datos del formulario
+            const nuevoCliente = {
+                nombre: document.getElementById('cliente-nombre').value,
+                identificacion: document.getElementById('cliente-identificacion').value,
+                telefono: document.getElementById('cliente-telefono').value,
+                correo: document.getElementById('cliente-correo').value,
+                direccion: document.getElementById('cliente-direccion').value,
+                estado: "Activo",
+                fechaRegistro: new Date()
+            };
+
+            try {
+                await addDoc(collection(db, "clientes"), nuevoCliente);
+                alert("¡Cliente registrado con éxito en la base de datos!");
+                formCliente.reset();
+            } catch (error) {
+                console.error(error);
+                alert("Error: " + error.message);
+            } finally {
+                btnGuardar.innerText = 'Guardar Cliente';
+                btnGuardar.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
