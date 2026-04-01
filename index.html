@@ -25,7 +25,7 @@
             
             <div class="text-center mb-8">
                 <div class="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-4">
-                    <i data-lucide="shield-check" class="text-blue-600 w-8 h-8"></i>
+                    <i data-lucide="hand-coins" class="text-blue-600 w-8 h-8"></i>
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900">LorHels Presta</h1>
                 <p class="text-gray-500 mt-2">Acceso al Sistema</p>
@@ -58,12 +58,6 @@
                     <span>Iniciar Sesión</span>
                 </button>
             </form>
-
-            <div class="mt-6 pt-4 border-t border-gray-100 text-center">
-                <button type="button" onclick="crearAdminInicial()" class="text-xs text-blue-500 hover:text-blue-700 underline">
-                    (Configuración) Crear mi cuenta Admin inicial
-                </button>
-            </div>
         </div>
     </div>
 
@@ -137,6 +131,69 @@
                         </button>
                     </form>
                 </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mt-6">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                        <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                        <span>Lista de Clientes Registrados</span>
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                    <th class="p-3 border-b font-medium">Nombre</th>
+                                    <th class="p-3 border-b font-medium">Identificación</th>
+                                    <th class="p-3 border-b font-medium">Teléfono</th>
+                                    <th class="p-3 border-b font-medium">Correo</th>
+                                    <th class="p-3 border-b font-medium text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-clientes" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="5" class="p-8 text-center text-gray-400">
+                                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+                                        Cargando base de datos...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="vista-cobradores" class="w-full max-w-4xl seccion-oculta fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Cobradores</h2>
+                <div class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
+                    <div class="p-4 bg-gray-50 rounded-full mb-4">
+                        <i data-lucide="hard-hat" class="w-12 h-12 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700">Módulo en construcción</h3>
+                    <p class="text-gray-500 mt-2 max-w-md mx-auto">Pronto podrás registrar, asignar rutas y administrar a todo tu equipo de cobradores desde aquí.</p>
+                </div>
+            </div>
+
+            <div id="vista-prestamos" class="w-full max-w-4xl seccion-oculta fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Préstamos</h2>
+                <div class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
+                    <div class="p-4 bg-gray-50 rounded-full mb-4">
+                        <i data-lucide="wrench" class="w-12 h-12 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700">Módulo en construcción</h3>
+                    <p class="text-gray-500 mt-2 max-w-md mx-auto">Aquí crearemos el sistema avanzado para calcular cuotas, intereses fijos/variables y asignar préstamos a tus clientes.</p>
+                </div>
+            </div>
+
+            <div id="vista-configuracion" class="w-full max-w-4xl seccion-oculta fade-in">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Configuración del Sistema</h2>
+                <div class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
+                    <div class="p-4 bg-gray-50 rounded-full mb-4">
+                        <i data-lucide="wrench" class="w-12 h-12 text-gray-400"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700">Módulo en construcción</h3>
+                    <p class="text-gray-500 mt-2 max-w-md mx-auto">Próximamente podrás ajustar las preferencias globales de tu negocio, modificar roles y gestionar la base de datos.</p>
+                </div>
             </div>
 
         </main>
@@ -145,7 +202,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYcO3Fwlb4Bktm2-4qyTIQjM0a-qk-koc",
@@ -235,9 +292,25 @@
 
         // --- 4. NAVEGACIÓN ENTRE VISTAS ---
         window.cambiarVista = (vistaDestino) => {
-            document.getElementById('vista-dashboard').classList.add('seccion-oculta');
-            document.getElementById('vista-clientes').classList.add('seccion-oculta');
-            document.getElementById(`vista-${vistaDestino}`).classList.remove('seccion-oculta');
+            // 1. Creamos una lista con los nombres de todas las pantallas
+            const vistasTotales = ['dashboard', 'cobradores', 'clientes', 'prestamos', 'configuracion'];
+            
+            // 2. Ocultamos todas las pantallas de la lista
+            vistasTotales.forEach(vista => {
+                const elemento = document.getElementById(`vista-${vista}`);
+                if (elemento) {
+                    elemento.classList.add('seccion-oculta');
+                }
+            });
+            
+            // 3. Mostramos únicamente la pantalla que el usuario seleccionó
+            const vistaAMostrar = document.getElementById(`vista-${vistaDestino}`);
+            if (vistaAMostrar) {
+                vistaAMostrar.classList.remove('seccion-oculta');
+            }
+            
+            // Recargamos los iconos de Lucide por si la nueva vista los necesita
+            lucide.createIcons();
         };
 
         // --- 5. MOSTRAR APLICACIÓN Y MENÚ ---
@@ -257,8 +330,10 @@
             
             if(rol === 'admin') {
                 htmlMenu += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></button>`;
+                htmlMenu += `<button onclick="cambiarVista('cobradores')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="briefcase" class="w-5 h-5"></i><span>Cobradores</span></button>`;
                 htmlMenu += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="users" class="w-5 h-5"></i><span>Clientes</span></button>`;
-                htmlMenu += `<button class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="banknotes" class="w-5 h-5"></i><span>Préstamos</span></button>`;
+                htmlMenu += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="hand-coins" class="w-5 h-5"></i><span>Préstamos</span></button>`;
+                htmlMenu += `<button onclick="cambiarVista('configuracion')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="settings" class="w-5 h-5"></i><span>Configuración</span></button>`;
             }
             
             menuNavegacion.innerHTML = htmlMenu;
@@ -296,6 +371,50 @@
                 btnGuardar.disabled = false;
             }
         });
+
+        // --- 7. CARGAR Y MOSTRAR CLIENTES EN TIEMPO REAL ---
+        const tbodyClientes = document.getElementById('tabla-clientes');
+        
+        if (tbodyClientes) {
+            // onSnapshot escucha los cambios en la carpeta "clientes" todo el tiempo
+            onSnapshot(collection(db, "clientes"), (snapshot) => {
+                tbodyClientes.innerHTML = ''; // Limpiamos la tabla antes de llenarla
+                
+                if (snapshot.empty) {
+                    tbodyClientes.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-gray-500 font-medium">
+                                No hay clientes registrados aún. ¡Agrega el primero arriba!
+                            </td>
+                        </tr>`;
+                    return;
+                }
+
+                // Por cada cliente en la base de datos, creamos una fila
+                snapshot.forEach((docCliente) => {
+                    const cliente = docCliente.data();
+                    
+                    // Diseñamos una pequeña etiqueta verde o roja para el estado
+                    const badgeEstado = cliente.estado === 'Activo' 
+                        ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold tracking-wide">Activo</span>' 
+                        : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold tracking-wide">Inactivo</span>';
+
+                    // Insertamos los datos en HTML
+                    const fila = `
+                        <tr class="hover:bg-blue-50/50 transition-colors">
+                            <td class="p-3 font-semibold text-gray-800">${cliente.nombre}</td>
+                            <td class="p-3 text-gray-500">${cliente.identificacion}</td>
+                            <td class="p-3">${cliente.telefono}</td>
+                            <td class="p-3">${cliente.correo || 'N/A'}</td>
+                            <td class="p-3 text-center">${badgeEstado}</td>
+                        </tr>
+                    `;
+                    tbodyClientes.innerHTML += fila;
+                });
+                
+                lucide.createIcons(); // Recargamos los iconos por si acaso
+            });
+        }
     </script>
 </body>
 </html>
