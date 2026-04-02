@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="do">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -208,7 +208,7 @@
             <div id="modal-pago" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
                 <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
                     <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
-                        <i data-lucide="banknotes" class="w-5 h-5 text-green-600"></i>
+                        <i data-lucide="banknote" class="w-5 h-5 text-green-600"></i>
                         <span>Registrar Pago Recibido</span>
                     </h3>
                     <p class="text-sm text-gray-600 mb-4" id="modal-pago-cliente"></p>
@@ -375,7 +375,7 @@
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
-                            <i data-lucide="banknotes" class="w-5 h-5 text-blue-600"></i>
+                            <i data-lucide="banknote" class="w-5 h-5 text-blue-600"></i>
                             <span>Crear Nuevo Préstamo</span>
                         </h3>
                         
@@ -486,6 +486,30 @@
                         </button>
                     </form>
                 </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                        <i data-lucide="percent" class="w-5 h-5 text-red-600"></i>
+                        <span>Parámetros de Mora y Recargos</span>
+                    </h3>
+                    <form id="form-ajustes-mora" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Porcentaje de Mora (%)</label>
+                            <input type="number" id="ajuste-mora-porcentaje" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Ej. 5" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Días de Gracia (antes del recargo)</label>
+                            <input type="number" id="ajuste-mora-dias" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500" placeholder="Ej. 5" required>
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition font-medium flex items-center space-x-2">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span>Guardar Configuración de Mora</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
             </div>
 
         </main>
@@ -627,12 +651,12 @@
                 html += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></button>`;
                 html += `<button onclick="cambiarVista('cobradores')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="briefcase" class="w-5 h-5"></i><span>Cobradores</span></button>`;
                 html += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="users" class="w-5 h-5"></i><span>Clientes</span></button>`;
-                html += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="banknotes" class="w-5 h-5"></i><span>Préstamos</span></button>`;
+                html += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="banknote" class="w-5 h-5"></i><span>Préstamos</span></button>`;
                 html += `<button onclick="cambiarVista('configuracion')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="settings" class="w-5 h-5"></i><span>Configuración</span></button>`;
             } else if (rol === 'cobrador') {
                 html += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="briefcase" class="w-5 h-5"></i><span>Mis Préstamos</span></button>`;
                 html += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="users" class="w-5 h-5"></i><span>Mis Clientes</span></button>`;
-                html += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="banknotes" class="w-5 h-5"></i><span>Pedir Préstamo</span></button>`;
+                html += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="banknote" class="w-5 h-5"></i><span>Pedir Préstamo</span></button>`;
             } else if (rol === 'cliente') {
                 html += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Mi Estado de Cuenta</span></button>`;
             }
@@ -642,6 +666,12 @@
             document.getElementById('dashboard-admin')?.classList.toggle('seccion-oculta', rol !== 'admin');
             document.getElementById('dashboard-cobrador')?.classList.toggle('seccion-oculta', rol !== 'cobrador');
             document.getElementById('dashboard-cliente')?.classList.toggle('seccion-oculta', rol !== 'cliente');
+
+            // Cargar ajustes de mora en los campos de texto
+            if (rol === 'admin') cargarAjustesMora();
+
+            // Ejecutar revisión automática de moras
+            if (rol === 'admin' || rol === 'cobrador') verificarYAplicarMoras();
 
             // Cargar datos en tiempo real
             cargarDatosTablas(rol, auth.currentUser.uid);
@@ -715,34 +745,57 @@
                         
                         tbCuotas.innerHTML = '';
                         p.planDePagos.forEach(cuota => {
-                            const b = cuota.estado === 'Pagado' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>' : '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
-                            tbCuotas.innerHTML += `<tr class="border-b"><td class="p-3">Cuota ${cuota.cuota}</td><td class="p-3 text-gray-500">${cuota.fecha}</td><td class="p-3 font-semibold">$${cuota.monto.toFixed(2)}</td><td class="p-3 text-center">${b}</td></tr>`;
+                            let badge = '';
+                            let btnImprimir = '';
+
+                            if (cuota.estado === 'Pagado') {
+                                badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>';
+                                // ¡AQUÍ ESTÁ EL BOTÓN DE IMPRESIÓN PARA EL CLIENTE!
+                                btnImprimir = `<button onclick="imprimirComprobanteCliente('${p.nombreCliente}', ${cuota.cuota}, '${cuota.fecha}', ${cuota.monto})" class="ml-2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1 rounded-full" title="Imprimir Recibo"><i data-lucide="printer" class="w-4 h-4 inline"></i></button>`;
+                            } else {
+                                badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                            }
+                            
+                            tbCuotas.innerHTML += `<tr class="border-b"><td class="p-3">Cuota ${cuota.cuota}</td><td class="p-3 text-gray-500">${cuota.fecha}</td><td class="p-3 font-semibold">$${cuota.monto.toFixed(2)}</td><td class="p-3 text-center flex justify-center items-center">${badge} ${btnImprimir}</td></tr>`;
                         });
+                        lucide.createIcons(); // Cargamos el icono de la impresora
                     }
                 });
-            } 
+            }
             
             // C. VISTA DEL COBRADOR (Dashboard Operativo)
             else if (rol === 'cobrador') {
                 const tDashCob = document.getElementById('tabla-dashboard-cobrador');
-                
-                // IMPORTANTE: Ahora filtramos por cobradorId
                 onSnapshot(query(collection(db, "prestamos"), where("cobradorId", "==", uid)), (snap) => {
                     if(tDashCob) {
                         tDashCob.innerHTML = '';
-                        
                         if (snap.empty) {
                             tDashCob.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">No tienes préstamos asignados a tu ruta.</td></tr>`;
                             return;
                         }
-
                         snap.forEach((docSnap) => {
                             const p = docSnap.data();
+                            
+                            // 1. Buscamos la cuota exacta que le toca pagar hoy
+                            let proximaCuotaMonto = p.valorCuota; // Por defecto
+                            let tieneMora = false;
+                            
+                            if (p.planDePagos) {
+                                const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
+                                if (cuotaPendiente) {
+                                    proximaCuotaMonto = cuotaPendiente.monto; // Este monto ya tiene la mora sumada si aplica
+                                    tieneMora = cuotaPendiente.moraAplicada ? true : false;
+                                }
+                            }
+
                             const badge = p.estado === 'Activo' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>' : `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">${p.estado}</span>`;
-                            const boton = p.estado === 'Activo' ? `<button onclick="abrirModalPago('${docSnap.id}', '${p.nombreCliente}', ${p.valorCuota})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium">Cobrar</button>` : '-';
+                            
+                            // 2. Pasamos el monto exacto y si tiene mora al botón
+                            const boton = p.estado === 'Activo' ? `<button onclick="abrirModalPago('${docSnap.id}', '${p.nombreCliente}', ${proximaCuotaMonto}, ${tieneMora})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium">Cobrar</button>` : '-';
+                            
                             tDashCob.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3">$${p.totalAPagar.toFixed(2)}</td><td class="p-3 text-blue-700 font-bold">$${p.balancePendiente.toFixed(2)}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center">${boton}</td></tr>`;
                         });
-                        lucide.createIcons(); // Cargamos los iconos si los hay
+                        lucide.createIcons();
                     }
                 });
             }
@@ -759,21 +812,60 @@
                     let totalCobrado = 0;
                     let hayPendientes = false;
 
-                    snap.forEach((d) => {
-                        const p = d.data();
-                        
-                        // Si está aprobado, lo sumamos a la tarjeta
-                        if (p.estado === "Aprobado") {
-                            totalCobrado += p.montoPagado;
-                        } 
-                        // Si está pendiente, lo dibujamos en la tabla
-                        else if (p.estado === "Pendiente de Aprobación") {
-                            hayPendientes = true;
-                            if (tPagos) {
-                                tPagos.innerHTML += `<tr><td class="p-3">${new Date(p.fechaRegistro).toLocaleDateString()}</td><td class="p-3">${p.cobradorNombre}</td><td class="p-3 text-xs text-gray-400">${p.prestamoId.substring(0,6)}...</td><td class="p-3 text-green-600 font-bold">$${p.montoPagado.toFixed(2)}</td><td class="p-3"><button onclick="aprobarPago('${d.id}', '${p.prestamoId}', ${p.montoPagado})" class="bg-green-500 text-white p-1 rounded hover:bg-green-600 mr-1" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button><button onclick="rechazarPago('${d.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button></td></tr>`;
+                    // Lista Completa de Préstamos (Con botón de Cobrar para el Admin)
+                onSnapshot(collection(db, "prestamos"), (snap) => {
+                    const tPres = document.getElementById('tabla-prestamos');
+                    if(tPres) {
+                        tPres.innerHTML = '';
+                        let totalPrestado = 0;
+
+                        snap.forEach((d) => {
+                            const p = d.data();
+                            if (p.estado === 'Activo' || p.estado === 'Pagado Completamente') {
+                                totalPrestado += p.montoCapital;
                             }
-                        }
-                    });
+
+                            // Calcular la próxima cuota y mora por si el Admin quiere cobrar
+                            let proximaCuotaMonto = p.valorCuota;
+                            let tieneMora = false;
+                            if (p.planDePagos) {
+                                const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
+                                if (cuotaPendiente) {
+                                    proximaCuotaMonto = cuotaPendiente.monto;
+                                    tieneMora = cuotaPendiente.moraAplicada ? true : false;
+                                }
+                            }
+
+                            let badge = '', boton = '-';
+                            if (p.estado === 'Activo') {
+                                badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>';
+                                // EL ADMIN AHORA TIENE BOTÓN DE COBRAR AQUÍ
+                                boton = `<button onclick="abrirModalPago('${d.id}', '${p.nombreCliente}', ${proximaCuotaMonto}, ${tieneMora})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium mr-2"><i data-lucide="plus-circle" class="w-3 h-3 inline mr-1"></i>Cobrar</button>`;
+                            } else if (p.estado === 'Rechazado') {
+                                badge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Rechazado</span>';
+                                boton = '<span class="text-xs text-gray-400">Rechazado</span>';
+                            } else if (p.estado === 'Pagado Completamente') {
+                                badge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Saldado</span>';
+                                boton = '<span class="text-xs text-gray-400">Completado</span>';
+                            } else {
+                                badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                                boton = `
+                                    <div class="flex justify-center space-x-2 mr-2">
+                                        <button onclick="aprobarPrestamo('${d.id}')" class="bg-green-500 text-white p-1 rounded hover:bg-green-600" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                        <button onclick="rechazarPrestamo('${d.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                    </div>`;
+                            }
+                            
+                            const btnEliminarPrestamo = `<button onclick="eliminarPrestamo('${d.id}')" class="text-red-400 hover:text-red-600 ml-2" title="Eliminar Préstamo"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                            
+                            tPres.innerHTML += `<tr><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3 font-medium text-blue-700">$${p.totalAPagar.toFixed(2)}</td><td class="p-3">${p.cantidadCuotas} cuotas</td><td class="p-3 text-xs text-gray-500">${p.creadoPorNombre}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center flex items-center justify-center">${boton} ${btnEliminarPrestamo}</td></tr>`;
+                        });
+                        
+                        const statPrestado = document.getElementById('stat-prestado');
+                        if (statPrestado) statPrestado.innerText = `$${totalPrestado.toFixed(2)}`;
+                        lucide.createIcons();
+                    }
+                });
                     
                     // Actualizamos la tarjeta de Total Cobrado
                     const statCobrado = document.getElementById('stat-cobrado');
@@ -1032,18 +1124,38 @@
         // 7. SISTEMA DE PAGOS, TICKETS Y APROBACIONES
         // ============================================================================
         
-        // A. Manejo del Modal
-        window.abrirModalPago = (id, nombre, cuota) => {
+        // A. Manejo del Modal (Adaptable para Admin y Cobrador)
+        window.abrirModalPago = (id, nombre, cuotaMonto, tieneMora) => {
             document.getElementById('modal-pago').classList.remove('hidden');
             document.getElementById('pago-prestamo-id').value = id;
-            document.getElementById('modal-pago-cliente').innerText = `Cliente: ${nombre}`;
-            document.getElementById('pago-monto').value = cuota.toFixed(2);
+            
+            let htmlCliente = `Cliente: ${nombre}`;
+            if (tieneMora) {
+                htmlCliente += `<br><span class="text-red-600 font-bold text-xs mt-1 inline-block">⚠️ Esta cuota incluye recargos por atraso</span>`;
+            }
+            
+            document.getElementById('modal-pago-cliente').innerHTML = htmlCliente;
+            document.getElementById('pago-monto').value = cuotaMonto.toFixed(2);
+
+            // Cambiar el texto del botón según quién esté cobrando
+            const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
+            document.getElementById('btn-guardar-pago').innerText = rolActual === 'admin' ? "Cobrar y Aprobar Directo" : "Enviar a Aprobación";
         };
+        
         window.cerrarModalPago = () => { document.getElementById('modal-pago').classList.add('hidden'); };
 
-        // B. Generador de Ticket (Impresión Térmica)
-        window.imprimirTicket = (fecha, cliente, monto, cobrador) => {
+        // B. Generador de Ticket (Ahora incluye nota de mora y escudo anti-bloqueo)
+        window.imprimirTicket = (fecha, cliente, monto, cobrador, tieneMora) => {
             const ventanaTicket = window.open('', '_blank', 'width=350,height=500');
+            
+            // ESCUDO DE SEGURIDAD: Si el navegador bloqueó la ventana, avisamos al usuario
+            if (!ventanaTicket) {
+                alert("⚠️ Tu navegador bloqueó el recibo. Por favor, busca el icono en la barra de direcciones (arriba), permite las ventanas emergentes (pop-ups) para esta página y vuelve a intentarlo.");
+                return;
+            }
+            
+            let htmlMora = tieneMora ? `<div style="color: red; text-align: center; font-size: 12px; margin-top: 5px; font-weight: bold;">* Incluye pago de recargos por mora</div>` : '';
+
             ventanaTicket.document.write(`
                 <html>
                 <head>
@@ -1053,7 +1165,7 @@
                         h2 { text-align: center; margin: 0; font-size: 20px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
                         .info { margin-top: 15px; font-size: 14px; }
                         .info div { display: flex; justify-content: space-between; margin-bottom: 5px; }
-                        .monto-total { text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 10px 0; }
+                        .monto-total { text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0 5px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 10px 0; }
                         .footer { text-align: center; font-size: 12px; margin-top: 20px; color: #555; }
                     </style>
                 </head>
@@ -1064,10 +1176,11 @@
                         <div><span>Recibo #:</span> <span>${Math.floor(Math.random() * 90000) + 10000}</span></div>
                         <br>
                         <div><span>Cliente:</span></div>
-                        <div style="font-weight: bold;">${cliente.replace('Cliente: ', '')}</div>
+                        <div style="font-weight: bold;">${cliente}</div>
                         <div><span>Atendido por:</span> <span>${cobrador}</span></div>
                     </div>
                     <div class="monto-total">VALOR: $${monto.toFixed(2)}</div>
+                    ${htmlMora}
                     <div class="footer">El pago está sujeto a verificación.<br>¡Gracias por preferirnos!</div>
                     <script> window.onload = function() { window.print(); window.close(); } <\/script>
                 </body>
@@ -1076,7 +1189,56 @@
             ventanaTicket.document.close();
         };
 
-        // C. Guardar Pago (Cobrador)
+        // B2. Generador de Comprobante (Para el Portal del Cliente)
+        window.imprimirComprobanteCliente = (cliente, numCuota, fechaCuota, monto) => {
+            const ventanaTicket = window.open('', '_blank', 'width=350,height=500');
+            
+            // ESCUDO DE SEGURIDAD
+            if (!ventanaTicket) {
+                alert("⚠️ Tu navegador bloqueó el comprobante. Por favor, permite las ventanas emergentes (pop-ups) y vuelve a hacer clic en imprimir.");
+                return;
+            }
+
+            const fechaImpresion = new Date().toLocaleDateString();
+            
+            ventanaTicket.document.write(`
+                <html>
+                <head>
+                    <title>Comprobante de Pago</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; width: 280px; margin: 0 auto; padding: 20px 10px; color: #000; }
+                        h2 { text-align: center; margin: 0; font-size: 20px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+                        .info { margin-top: 15px; font-size: 14px; }
+                        .info div { display: flex; justify-content: space-between; margin-bottom: 5px; }
+                        .monto-total { text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0 5px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 10px 0; }
+                        .sello { text-align: center; font-size: 18px; font-weight: bold; color: #166534; border: 2px solid #166534; padding: 5px; border-radius: 4px; letter-spacing: 2px; margin: 15px 0; transform: rotate(-5deg); width: 80%; margin-left: 10%;}
+                        .footer { text-align: center; font-size: 12px; margin-top: 20px; color: #555; }
+                    </style>
+                </head>
+                <body>
+                    <h2>LORHELS PRESTA</h2>
+                    <div class="info">
+                        <div><span>Impreso el:</span> <span>${fechaImpresion}</span></div>
+                        <div><span>Recibo #:</span> <span>WEB-${Math.floor(Math.random() * 90000) + 10000}</span></div>
+                        <br>
+                        <div><span>Cliente:</span></div>
+                        <div style="font-weight: bold;">${cliente}</div>
+                        <div><span>Concepto:</span> <span>Cuota ${numCuota}</span></div>
+                        <div><span>Vencimiento:</span> <span>${fechaCuota}</span></div>
+                    </div>
+                    <div class="monto-total">VALOR: $${monto.toFixed(2)}</div>
+                    
+                    <div class="sello">PAGADO</div>
+                    
+                    <div class="footer">Este es un comprobante digital auto-generado.<br>¡Gracias por tu pago puntual!</div>
+                    <script> window.onload = function() { window.print(); window.close(); } <\/script>
+                </body>
+                </html>
+            `);
+            ventanaTicket.document.close();
+        };
+
+        // C. Guardar Pago (Diferente si es Admin o Cobrador)
         document.getElementById('form-pago')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById('btn-guardar-pago');
@@ -1084,22 +1246,97 @@
 
             const prestamoId = document.getElementById('pago-prestamo-id').value;
             const montoPagado = parseFloat(document.getElementById('pago-monto').value);
-            const nombreCliente = document.getElementById('modal-pago-cliente').innerText;
+            
+            const divClienteHTML = document.getElementById('modal-pago-cliente').innerHTML;
+            const tieneMora = divClienteHTML.includes('recargos por atraso');
+            const nombreCliente = divClienteHTML.split('<br>')[0].replace('Cliente: ', '');
+            
             const nombreCobrador = document.getElementById('nombre-usuario').innerText;
+            const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
 
             try {
-                await addDoc(collection(db, "pagos"), {
-                    prestamoId: prestamoId,
-                    cobradorId: auth.currentUser.uid, cobradorNombre: nombreCobrador,
-                    montoPagado: montoPagado, estado: "Pendiente de Aprobación", 
-                    fechaRegistro: new Date().toISOString()
-                });
-                cerrarModalPago();
-                if (confirm("¡Pago registrado! ¿Deseas imprimir el Ticket de Pago?")) {
-                    imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, nombreCobrador);
+                if (rolActual === 'admin') {
+                    // 1. FLUJO DEL ADMINISTRADOR: El pago entra ya aprobado
+                    await addDoc(collection(db, "pagos"), {
+                        prestamoId: prestamoId,
+                        cobradorId: auth.currentUser.uid, 
+                        cobradorNombre: "Admin: " + nombreCobrador, // Marca que lo cobró en caja
+                        montoPagado: montoPagado, 
+                        estado: "Aprobado", // <-- Directo a ganancias
+                        fechaRegistro: new Date().toISOString()
+                    });
+
+                    // 2. Amortizamos las cuotas instantáneamente
+                    const pref = doc(db, "prestamos", prestamoId);
+                    const pDoc = await getDoc(pref);
+                    
+                    if (pDoc.exists()) {
+                        const datos = pDoc.data();
+                        let nBalance = datos.balancePendiente - montoPagado;
+                        if (nBalance < 0) nBalance = 0;
+
+                        let planActualizado = [...datos.planDePagos];
+                        let sobrante = montoPagado;
+
+                        // Pagar cuota actual
+                        for (let i = 0; i < planActualizado.length; i++) {
+                            if (planActualizado[i].estado === "Pendiente") {
+                                if (sobrante >= planActualizado[i].monto) {
+                                    sobrante -= planActualizado[i].monto;
+                                    planActualizado[i].estado = "Pagado";
+                                    break; 
+                                } else {
+                                    planActualizado[i].monto -= sobrante;
+                                    sobrante = 0;
+                                    break;
+                                }
+                            }
+                        }
+
+                        // Sobrante a la última cuota
+                        if (sobrante > 0) {
+                            for (let i = planActualizado.length - 1; i >= 0; i--) {
+                                if (planActualizado[i].estado === "Pendiente") {
+                                    if (sobrante >= planActualizado[i].monto) {
+                                        sobrante -= planActualizado[i].monto;
+                                        planActualizado[i].monto = 0;
+                                        planActualizado[i].estado = "Pagado"; 
+                                    } else {
+                                        planActualizado[i].monto -= sobrante;
+                                        sobrante = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        await updateDoc(pref, {
+                            balancePendiente: nBalance,
+                            planDePagos: planActualizado,
+                            estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
+                        });
+                    }
+
+                    cerrarModalPago();
+                    if (confirm("¡Cobro directo procesado con éxito! El balance se ha reducido automáticamente. ¿Deseas imprimir el recibo?")) {
+                        imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
+                    }
+
+                } else {
+                    // FLUJO DEL COBRADOR: Se va a bandeja de pendientes
+                    await addDoc(collection(db, "pagos"), {
+                        prestamoId: prestamoId,
+                        cobradorId: auth.currentUser.uid, cobradorNombre: nombreCobrador,
+                        montoPagado: montoPagado, estado: "Pendiente de Aprobación", 
+                        fechaRegistro: new Date().toISOString()
+                    });
+                    cerrarModalPago();
+                    if (confirm("¡Pago registrado para revisión! ¿Deseas imprimir el Ticket?")) {
+                        imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, nombreCobrador, tieneMora);
+                    }
                 }
-            } catch (error) { alert("Error al enviar pago: " + error.message); } 
-            finally { btnSubmit.disabled = false; btnSubmit.innerText = "Enviar a Aprobación"; }
+            } catch (error) { alert("Error al procesar pago: " + error.message); } 
+            finally { btnSubmit.disabled = false; btnSubmit.innerText = "Procesar Pago"; }
         });
 
         // D. Administrador: Aprobar / Rechazar Operaciones
@@ -1270,6 +1507,84 @@
                     }
                 });
             });
+        }
+
+        // ============================================================================
+        // 10. SISTEMA DE MORA PROGRAMABLE
+        // ============================================================================
+
+        // A. Guardar Ajustes de Mora
+        const formMora = document.getElementById('form-ajustes-mora');
+        if (formMora) {
+            formMora.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const porcentaje = parseFloat(document.getElementById('ajuste-mora-porcentaje').value);
+                const diasGracia = parseInt(document.getElementById('ajuste-mora-dias').value);
+
+                try {
+                    await setDoc(doc(db, "ajustes", "mora"), {
+                        porcentaje: porcentaje,
+                        diasGracia: diasGracia,
+                        ultimaActualizacion: new Date().toISOString()
+                    });
+                    alert("✅ Configuración de mora guardada con éxito.");
+                } catch (error) { alert("Error: " + error.message); }
+            });
+        }
+
+        // B. Función Maestra: Verificar y Aplicar Recargos
+        async function verificarYAplicarMoras() {
+            // 1. Obtener los ajustes de mora
+            const ajustesSnap = await getDoc(doc(db, "ajustes", "mora"));
+            if (!ajustesSnap.exists()) return; // Si no hay configuración, no hace nada
+            
+            const { porcentaje, diasGracia } = ajustesSnap.data();
+            const hoy = new Date();
+
+            // 2. Traer préstamos activos
+            const q = query(collection(db, "prestamos"), where("estado", "==", "Activo"));
+            const querySnapshot = await getDocs(q);
+
+            querySnapshot.forEach(async (documento) => {
+                const p = documento.data();
+                const prestamoRef = doc(db, "prestamos", documento.id);
+                let planActualizado = [...p.planDePagos];
+                let huboCambios = false;
+                let recargoTotal = 0;
+
+                planActualizado.forEach((cuota) => {
+                    const fechaCuota = new Date(cuota.fecha + 'T12:00:00');
+                    // Calculamos la diferencia en días
+                    const diffTiempo = hoy - fechaCuota;
+                    const diffDias = Math.floor(diffTiempo / (1000 * 60 * 60 * 24));
+
+                    // Si el atraso es mayor a los días de gracia y no se ha aplicado mora antes
+                    if (cuota.estado === "Pendiente" && diffDias > diasGracia && !cuota.moraAplicada) {
+                        const recargo = cuota.monto * (porcentaje / 100);
+                        cuota.monto += recargo;
+                        cuota.moraAplicada = true; // Marcamos para no cobrar doble
+                        cuota.valorMora = recargo; 
+                        recargoTotal += recargo;
+                        huboCambios = true;
+                    }
+                });
+
+                if (huboCambios) {
+                    await updateDoc(prestamoRef, {
+                        planDePagos: planActualizado,
+                        balancePendiente: p.balancePendiente + recargoTotal
+                    });
+                }
+            });
+        }
+
+        // C. Cargar ajustes actuales en el formulario (al entrar a Configuración)
+        async function cargarAjustesMora() {
+            const snap = await getDoc(doc(db, "ajustes", "mora"));
+            if (snap.exists()) {
+                document.getElementById('ajuste-mora-porcentaje').value = snap.data().porcentaje;
+                document.getElementById('ajuste-mora-dias').value = snap.data().diasGracia;
+            }
         }
     </script>
 </body>
