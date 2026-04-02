@@ -1238,6 +1238,64 @@
             ventanaTicket.document.close();
         };
 
+        // B3. Generador de Mensajes de WhatsApp (Con Anti-Bloqueo)
+        window.enviarWhatsApp = async (prestamoId, monto, nombreCliente, nombreCobrador, tieneMora) => {
+            // TRUCO ANTI-BLOQUEO: Abrimos la pestaña vacía INMEDIATAMENTE al dar clic
+            const ventanaWhatsApp = window.open('about:blank', '_blank');
+            
+            if (!ventanaWhatsApp) {
+                alert("⚠️ Tu navegador bloqueó la ventana. Por favor permite las ventanas emergentes.");
+                return;
+            }
+
+            try {
+                // 1. Obtener el préstamo
+                const prestamoSnap = await getDoc(doc(db, "prestamos", prestamoId));
+                if (!prestamoSnap.exists()) {
+                    ventanaWhatsApp.close();
+                    return;
+                }
+                
+                const datosPrestamo = prestamoSnap.data();
+                const clienteId = datosPrestamo.clienteId;
+                const balanceActual = datosPrestamo.balancePendiente;
+
+                // 2. Obtener el teléfono
+                const clienteSnap = await getDoc(doc(db, "clientes", clienteId));
+                if (!clienteSnap.exists()) {
+                    ventanaWhatsApp.close();
+                    alert("No se encontró el perfil del cliente.");
+                    return;
+                }
+                
+                let telefono = clienteSnap.data().telefono;
+
+                // 3. Limpiar el teléfono (Solo números)
+                telefono = telefono.replace(/\D/g,'');
+                if (telefono.length === 10) {
+                    telefono = "1" + telefono; // Código de país para números de 10 dígitos (Ej: RD)
+                }
+
+                // 4. Armar el mensaje
+                let mensaje = `*LORHELS PRESTA - RECIBO DE PAGO* 🧾\n\n`;
+                mensaje += `Hola *${nombreCliente}*, hemos registrado tu pago exitosamente.\n\n`;
+                mensaje += `💰 *Monto Pagado:* $${monto.toFixed(2)}\n`;
+                if(tieneMora) mensaje += `⚠️ _Incluye recargos por atraso_\n`;
+                mensaje += `📉 *Balance Pendiente:* $${balanceActual.toFixed(2)}\n`;
+                mensaje += `👤 *Atendido por:* ${nombreCobrador}\n\n`;
+                mensaje += `_Gracias por tu pago puntual._`;
+
+                // 5. Redirigir la pestaña que abrimos al principio hacia WhatsApp
+                const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
+                ventanaWhatsApp.location.href = urlWhatsApp;
+                
+            } catch (error) {
+                ventanaWhatsApp.close();
+                console.error("Error armando el WhatsApp:", error);
+                alert("Hubo un error al intentar generar el mensaje de WhatsApp.");
+            }
+        };
+
         // C. Guardar Pago (Diferente si es Admin o Cobrador)
         document.getElementById('form-pago')?.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -1256,17 +1314,17 @@
 
             try {
                 if (rolActual === 'admin') {
-                    // 1. FLUJO DEL ADMINISTRADOR: El pago entra ya aprobado
+                    // FLUJO DEL ADMINISTRADOR
                     await addDoc(collection(db, "pagos"), {
                         prestamoId: prestamoId,
                         cobradorId: auth.currentUser.uid, 
-                        cobradorNombre: "Admin: " + nombreCobrador, // Marca que lo cobró en caja
+                        cobradorNombre: "Admin: " + nombreCobrador, 
                         montoPagado: montoPagado, 
-                        estado: "Aprobado", // <-- Directo a ganancias
+                        estado: "Aprobado", 
                         fechaRegistro: new Date().toISOString()
                     });
 
-                    // 2. Amortizamos las cuotas instantáneamente
+                    // Amortizamos las cuotas instantáneamente
                     const pref = doc(db, "prestamos", prestamoId);
                     const pDoc = await getDoc(pref);
                     
@@ -1278,7 +1336,6 @@
                         let planActualizado = [...datos.planDePagos];
                         let sobrante = montoPagado;
 
-                        // Pagar cuota actual
                         for (let i = 0; i < planActualizado.length; i++) {
                             if (planActualizado[i].estado === "Pendiente") {
                                 if (sobrante >= planActualizado[i].monto) {
@@ -1293,7 +1350,6 @@
                             }
                         }
 
-                        // Sobrante a la última cuota
                         if (sobrante > 0) {
                             for (let i = planActualizado.length - 1; i >= 0; i--) {
                                 if (planActualizado[i].estado === "Pendiente") {
@@ -1318,21 +1374,32 @@
                     }
 
                     cerrarModalPago();
-                    if (confirm("¡Cobro directo procesado con éxito! El balance se ha reducido automáticamente. ¿Deseas imprimir el recibo?")) {
+                    
+                    // PREGUNTAS POST-PAGO (IMPRIMIR Y/O WHATSAPP)
+                    if (confirm("¡Cobro directo procesado con éxito! ¿Deseas IMPRIMIR el recibo en papel?")) {
                         imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
+                    }
+                    if (confirm("¿Deseas enviar el comprobante digital por WHATSAPP al cliente?")) {
+                        enviarWhatsApp(prestamoId, montoPagado, nombreCliente, "Admin: " + nombreCobrador, tieneMora);
                     }
 
                 } else {
-                    // FLUJO DEL COBRADOR: Se va a bandeja de pendientes
+                    // FLUJO DEL COBRADOR
                     await addDoc(collection(db, "pagos"), {
                         prestamoId: prestamoId,
                         cobradorId: auth.currentUser.uid, cobradorNombre: nombreCobrador,
                         montoPagado: montoPagado, estado: "Pendiente de Aprobación", 
                         fechaRegistro: new Date().toISOString()
                     });
+                    
                     cerrarModalPago();
-                    if (confirm("¡Pago registrado para revisión! ¿Deseas imprimir el Ticket?")) {
+                    
+                    // PREGUNTAS POST-PAGO (IMPRIMIR Y/O WHATSAPP)
+                    if (confirm("¡Pago registrado para revisión! ¿Deseas IMPRIMIR el Ticket?")) {
                         imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, nombreCobrador, tieneMora);
+                    }
+                    if (confirm("¿Deseas enviar la notificación de pago por WHATSAPP al cliente?")) {
+                        enviarWhatsApp(prestamoId, montoPagado, nombreCliente, nombreCobrador, tieneMora);
                     }
                 }
             } catch (error) { alert("Error al procesar pago: " + error.message); } 
