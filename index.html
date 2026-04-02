@@ -90,11 +90,141 @@
 
         <main class="flex-1 overflow-y-auto h-full p-6 bg-gray-50 flex flex-col items-center justify-start" id="main-content">
             
-            <div id="vista-dashboard" class="w-full max-w-4xl text-center mt-10 fade-in">
-                <i data-lucide="check-circle" class="w-20 h-20 text-green-500 mx-auto mb-4"></i>
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">¡Bienvenido a LorHels Presta!</h2>
-                <p class="text-gray-600">Has entrado a la base de datos real de Firebase.</p>
-                <p id="bienvenida-rol" class="mt-4 font-medium text-blue-600 bg-blue-50 py-2 px-4 rounded-lg inline-block"></p>
+            <div id="vista-dashboard" class="w-full max-w-5xl fade-in">
+                
+                <div id="dashboard-admin" class="seccion-oculta">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Resumen del Negocio</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 border-l-4 border-l-blue-500">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Total Prestado (Capital)</p>
+                                    <h4 class="text-2xl font-bold text-gray-800" id="stat-prestado">$0.00</h4>
+                                </div>
+                                <div class="p-3 bg-blue-50 rounded-full text-blue-600">
+                                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 border-l-4 border-l-green-500">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Total Cobrado</p>
+                                    <h4 class="text-2xl font-bold text-gray-800" id="stat-cobrado">$0.00</h4>
+                                </div>
+                                <div class="p-3 bg-green-50 rounded-full text-green-600">
+                                    <i data-lucide="wallet" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-purple-100 border-l-4 border-l-purple-500">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-500 mb-1">Clientes Activos</p>
+                                    <h4 class="text-2xl font-bold text-gray-800" id="stat-clientes">0</h4>
+                                </div>
+                                <div class="p-3 bg-purple-50 rounded-full text-purple-600">
+                                    <i data-lucide="users" class="w-6 h-6"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-4">Pagos por Aprobar</h3>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                        <th class="p-3 border-b font-medium">Fecha</th>
+                                        <th class="p-3 border-b font-medium">Cobrador</th>
+                                        <th class="p-3 border-b font-medium">Préstamo ID</th>
+                                        <th class="p-3 border-b font-medium">Monto Recibido</th>
+                                        <th class="p-3 border-b font-medium text-center">Acción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-pagos-admin" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dashboard-cobrador" class="seccion-oculta">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Mis Préstamos Asignados</h2>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                        <th class="p-3 border-b font-medium">Cliente</th>
+                                        <th class="p-3 border-b font-medium">Monto Total</th>
+                                        <th class="p-3 border-b font-medium">Balance Pendiente</th>
+                                        <th class="p-3 border-b font-medium text-center">Estado</th>
+                                        <th class="p-3 border-b font-medium text-center">Gestión</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-dashboard-cobrador" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="dashboard-cliente" class="seccion-oculta">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Mi Estado de Cuenta</h2>
+                    
+                    <div id="info-prestamo-cliente" class="mb-6 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <p class="text-center text-gray-500">Cargando tu información financiera...</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full">
+                        <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                            <i data-lucide="calendar" class="w-5 h-5 text-blue-600"></i>
+                            <span>Mi Plan de Pagos</span>
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                        <th class="p-3 border-b font-medium">Cuota</th>
+                                        <th class="p-3 border-b font-medium">Fecha de Pago</th>
+                                        <th class="p-3 border-b font-medium">Monto</th>
+                                        <th class="p-3 border-b font-medium text-center">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-cuotas-cliente" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="modal-pago" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                        <i data-lucide="banknotes" class="w-5 h-5 text-green-600"></i>
+                        <span>Registrar Pago Recibido</span>
+                    </h3>
+                    <p class="text-sm text-gray-600 mb-4" id="modal-pago-cliente"></p>
+                    
+                    <form id="form-pago" class="space-y-4">
+                        <input type="hidden" id="pago-prestamo-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Monto Cobrado ($)</label>
+                            <input type="number" id="pago-monto" step="0.01" min="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                        </div>
+                        <div class="flex justify-end space-x-3 mt-6">
+                            <button type="button" onclick="cerrarModalPago()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition font-medium">Cancelar</button>
+                            <button type="submit" id="btn-guardar-pago" class="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition font-medium">Enviar a Aprobación</button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div id="vista-clientes" class="w-full max-w-4xl seccion-oculta fade-in">
@@ -117,38 +247,57 @@
                                 <input type="tel" id="cliente-telefono" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
-                                <input type="email" id="cliente-correo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            </div>
-                            <div class="md:col-span-2">
                                 <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
                                 <input type="text" id="cliente-direccion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
                             </div>
+                            <div class="bg-blue-50 p-4 rounded-lg md:col-span-2 border border-blue-100">
+                                <h4 class="text-sm font-bold text-blue-800 mb-3">Datos de Acceso al Portal del Cliente</h4>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                                        <input type="email" id="cliente-correo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña Temporal</label>
+                                        <input type="text" id="cliente-password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Mínimo 6 caracteres" required>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" id="btn-guardar-cliente" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center space-x-2">
+                        <button type="submit" id="btn-guardar-cliente" class="mt-4 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition font-medium flex items-center justify-center space-x-2">
                             <i data-lucide="save" class="w-4 h-4"></i>
-                            <span>Guardar Cliente</span>
+                            <span>Crear Cliente y Cuenta de Acceso</span>
                         </button>
                     </form>
                 </div>
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mt-6">
-                    <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
-                        <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
-                        <span>Lista de Clientes Registrados</span>
-                    </h3>
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b pb-4 gap-4">
+                        <h3 class="text-lg font-semibold flex items-center space-x-2">
+                            <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                            <span>Lista de Clientes Registrados</span>
+                        </h3>
+                        
+                        <div class="relative w-full md:w-72">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i data-lucide="search" class="text-gray-400 w-4 h-4"></i>
+                            </div>
+                            <input type="text" id="buscador-clientes" class="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm bg-gray-50 focus:bg-white transition-colors" placeholder="Buscar por nombre o cédula...">
+                        </div>
+                    </div>
                     
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
-                                <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
-                                    <th class="p-3 border-b font-medium">Nombre</th>
-                                    <th class="p-3 border-b font-medium">Identificación</th>
-                                    <th class="p-3 border-b font-medium">Teléfono</th>
-                                    <th class="p-3 border-b font-medium">Correo</th>
-                                    <th class="p-3 border-b font-medium text-center">Estado</th>
-                                </tr>
-                            </thead>
+                                    <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                        <th class="p-3 border-b font-medium">Nombre</th>
+                                        <th class="p-3 border-b font-medium">Identificación</th>
+                                        <th class="p-3 border-b font-medium">Teléfono</th>
+                                        <th class="p-3 border-b font-medium">Correo</th>
+                                        <th class="p-3 border-b font-medium text-center">Estado</th>
+                                        <th class="p-3 border-b font-medium text-center">Acciones</th> 
+                                    </tr>
+                                </thead>
                             <tbody id="tabla-clientes" class="text-sm text-gray-600 divide-y divide-gray-100">
                                 <tr>
                                     <td colspan="5" class="p-8 text-center text-gray-400">
@@ -164,45 +313,225 @@
             </div>
 
             <div id="vista-cobradores" class="w-full max-w-4xl seccion-oculta fade-in">
-                <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Cobradores</h2>
-                <div class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
-                    <div class="p-4 bg-gray-50 rounded-full mb-4">
-                        <i data-lucide="hard-hat" class="w-12 h-12 text-gray-400"></i>
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Equipo de Cobranza</h2>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                        <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                        <span>Lista de Cobradores</span>
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                    <th class="p-3 border-b font-medium">Nombre</th>
+                                    <th class="p-3 border-b font-medium">Teléfono</th>
+                                    <th class="p-3 border-b font-medium">Ruta</th>
+                                    <th class="p-3 border-b font-medium text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-cobradores" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                </tbody>
+                        </table>
                     </div>
-                    <h3 class="text-xl font-medium text-gray-700">Módulo en construcción</h3>
-                    <p class="text-gray-500 mt-2 max-w-md mx-auto">Pronto podrás registrar, asignar rutas y administrar a todo tu equipo de cobradores desde aquí.</p>
                 </div>
+
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mt-8">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                        <i data-lucide="clipboard-check" class="w-5 h-5 text-blue-600"></i>
+                        <span>Panel de Aprobación y Todos los Préstamos</span>
+                    </h3>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                    <th class="p-3 border-b font-medium">Cliente</th>
+                                    <th class="p-3 border-b font-medium">Monto Total</th>
+                                    <th class="p-3 border-b font-medium">Plan</th>
+                                    <th class="p-3 border-b font-medium">Creado por</th>
+                                    <th class="p-3 border-b font-medium text-center">Estado</th>
+                                    <th class="p-3 border-b font-medium text-center">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-prestamos" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                <tr>
+                                    <td colspan="6" class="p-8 text-center text-gray-400">
+                                        <i data-lucide="loader-2" class="w-6 h-6 animate-spin mx-auto mb-2"></i>
+                                        Cargando préstamos...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
 
-            <div id="vista-prestamos" class="w-full max-w-4xl seccion-oculta fade-in">
+            <div id="vista-prestamos" class="w-full max-w-5xl seccion-oculta fade-in">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Gestión de Préstamos</h2>
-                <div class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
-                    <div class="p-4 bg-gray-50 rounded-full mb-4">
-                        <i data-lucide="wrench" class="w-12 h-12 text-gray-400"></i>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                            <i data-lucide="banknotes" class="w-5 h-5 text-blue-600"></i>
+                            <span>Crear Nuevo Préstamo</span>
+                        </h3>
+                        
+                        <form id="form-prestamo" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Cliente</label>
+                                <select id="prestamo-cliente" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white" required>
+                                    <option value="" disabled selected>Cargando clientes...</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Monto del Préstamo ($)</label>
+                                    <input type="number" id="prestamo-monto" min="1" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Interés Total (%)</label>
+                                    <input type="number" id="prestamo-interes" min="0" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej. 15 o 20" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia de Pago</label>
+                                    <select id="prestamo-frecuencia" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white" required>
+                                        <option value="Diario">Diario</option>
+                                        <option value="Semanal">Semanal</option>
+                                        <option value="Quincenal">Quincenal</option>
+                                        <option value="Mensual">Mensual</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad de Cuotas</label>
+                                    <input type="number" id="prestamo-cuotas" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Primer Pago</label>
+                                    <input type="date" id="prestamo-fecha-inicio" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" id="btn-guardar-prestamo" class="mt-6 w-full bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition font-bold flex items-center justify-center space-x-2">
+                                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                <span>Aprobar y Guardar Préstamo</span>
+                            </button>
+                        </form>
                     </div>
-                    <h3 class="text-xl font-medium text-gray-700">Módulo en construcción</h3>
-                    <p class="text-gray-500 mt-2 max-w-md mx-auto">Aquí crearemos el sistema avanzado para calcular cuotas, intereses fijos/variables y asignar préstamos a tus clientes.</p>
+
+                    <div class="bg-blue-50 p-6 rounded-xl shadow-sm border border-blue-100 flex flex-col justify-start">
+                        <h3 class="text-lg font-semibold mb-4 text-blue-800 border-b border-blue-200 pb-2">Resumen del Préstamo</h3>
+                        
+                        <div class="space-y-4 flex-1">
+                            <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 text-center">
+                                <p class="text-sm text-gray-500 font-medium">Valor de la Cuota</p>
+                                <p id="resumen-cuota" class="text-3xl font-bold text-gray-800 mt-1">$0.00</p>
+                            </div>
+                            
+                            <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                                <span class="text-gray-600">Capital Prestado:</span>
+                                <span id="resumen-capital" class="font-medium text-gray-800">$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-blue-200">
+                                <span class="text-gray-600">Interés Generado:</span>
+                                <span id="resumen-interes" class="font-medium text-red-500">+$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center py-2 text-lg">
+                                <span class="font-bold text-gray-800">Total a Pagar:</span>
+                                <span id="resumen-total" class="font-bold text-blue-700">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div id="vista-configuracion" class="w-full max-w-4xl seccion-oculta fade-in">
                 <h2 class="text-2xl font-bold text-gray-800 mb-6">Configuración del Sistema</h2>
-                <div class="bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center flex flex-col items-center justify-center">
-                    <div class="p-4 bg-gray-50 rounded-full mb-4">
-                        <i data-lucide="wrench" class="w-12 h-12 text-gray-400"></i>
-                    </div>
-                    <h3 class="text-xl font-medium text-gray-700">Módulo en construcción</h3>
-                    <p class="text-gray-500 mt-2 max-w-md mx-auto">Próximamente podrás ajustar las preferencias globales de tu negocio, modificar roles y gestionar la base de datos.</p>
+                
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
+                        <i data-lucide="shield-check" class="w-5 h-5 text-blue-600"></i>
+                        <span>Administración: Registrar Nuevo Cobrador</span>
+                    </h3>
+                    
+                    <form id="form-cobrador" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                                <input type="text" id="cobrador-nombre" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                                <input type="tel" id="cobrador-telefono" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Correo Electrónico</label>
+                                <input type="email" id="cobrador-correo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Contraseña Temporal (Mín. 6 letras)</label>
+                                <input type="text" id="cobrador-password" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Ruta o Zona Asignada</label>
+                                <input type="text" id="cobrador-ruta" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej. Zona Norte, Centro, etc." required>
+                            </div>
+                        </div>
+                        <button type="submit" id="btn-guardar-cobrador" class="mt-4 bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition font-medium flex items-center justify-center space-x-2">
+                            <i data-lucide="user-plus" class="w-4 h-4"></i>
+                            <span>Crear Perfil de Cobrador</span>
+                        </button>
+                    </form>
                 </div>
             </div>
 
         </main>
     </div>
 
+    <div id="modal-editar-cliente" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-md">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center space-x-2">
+                        <i data-lucide="edit" class="w-5 h-5 text-blue-600"></i>
+                        <span>Editar Cliente</span>
+                    </h3>
+                    
+                    <form id="form-editar-cliente" class="space-y-4">
+                        <input type="hidden" id="edit-cliente-id">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Nombre Completo</label>
+                            <input type="text" id="edit-cliente-nombre" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Identificación</label>
+                            <input type="text" id="edit-cliente-identificacion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                            <input type="tel" id="edit-cliente-telefono" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Dirección</label>
+                            <input type="text" id="edit-cliente-direccion" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                        </div>
+                        
+                        <div class="flex justify-end space-x-3 mt-6">
+                            <button type="button" onclick="cerrarModalEditarCliente()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition font-medium">Cancelar</button>
+                            <button type="submit" id="btn-guardar-edicion" class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition font-medium">Guardar Cambios</button>
+                        </div>
+                    </form>
+                </div>
+    </div>
+
     <script type="module">
+        // ============================================================================
+        // 1. IMPORTACIONES Y CONFIGURACIÓN DE FIREBASE
+        // ============================================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, addDoc, onSnapshot, updateDoc, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAYcO3Fwlb4Bktm2-4qyTIQjM0a-qk-koc",
@@ -213,206 +542,733 @@
             appId: "1:414430605308:web:caee3b944aae5d83b4cc79"
         };
 
+        // Instancia principal (La sesión actual)
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // App secundaria (Para crear cuentas de cobradores/clientes sin cerrar tu sesión)
+        const appSecundaria = initializeApp(firebaseConfig, "AppSecundaria");
+        const authSecundario = getAuth(appSecundaria);
+
+        // Inicializar iconos de interfaz
         lucide.createIcons();
 
-        // ELEMENTOS DEL DOM
+        // ============================================================================
+        // 2. SISTEMA DE AUTENTICACIÓN (LOGIN / LOGOUT)
+        // ============================================================================
         const formLogin = document.getElementById('form-login');
-        const msjError = document.getElementById('mensaje-error');
-        const msjExito = document.getElementById('mensaje-exito');
+        if (formLogin) {
+            formLogin.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+                const btnSubmit = document.getElementById('btn-submit');
+                const msjError = document.getElementById('mensaje-error');
 
-        // --- 1. INICIAR SESIÓN ---
-        formLogin.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            const btnSubmit = document.getElementById('btn-submit');
+                msjError.classList.add('seccion-oculta');
+                btnSubmit.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>';
+                btnSubmit.disabled = true;
 
-            msjError.classList.add('seccion-oculta');
-            btnSubmit.innerHTML = 'Conectando...';
-            btnSubmit.disabled = true;
-
-            try {
-                const credenciales = await signInWithEmailAndPassword(auth, email, password);
-                const docUsuario = await getDoc(doc(db, "usuarios", credenciales.user.uid));
-                
-                if (docUsuario.exists()) {
-                    const datosUsuario = docUsuario.data();
-                    mostrarApp(datosUsuario.rol, datosUsuario.nombre);
-                } else {
-                    throw new Error("El usuario existe, pero no tiene rol asignado.");
-                }
-            } catch (error) {
-                console.error(error);
-                msjError.innerText = "Error: Verifica tu correo y contraseña. (" + error.message + ")";
-                msjError.classList.remove('seccion-oculta');
-            } finally {
-                btnSubmit.innerHTML = 'Iniciar Sesión';
-                btnSubmit.disabled = false;
-            }
-        });
-
-        // --- 2. CREAR PRIMER ADMIN ---
-        window.crearAdminInicial = async () => {
-            const email = prompt("Ingresa el correo para el nuevo Administrador:");
-            const password = prompt("Ingresa una contraseña (mínimo 6 caracteres):");
-            const nombre = prompt("Ingresa tu nombre completo:");
-
-            if(!email || !password || !nombre) return;
-
-            try {
-                const credenciales = await createUserWithEmailAndPassword(auth, email, password);
-                
-                await setDoc(doc(db, "usuarios", credenciales.user.uid), {
-                    nombre: nombre,
-                    email: email,
-                    rol: "admin",
-                    fechaCreacion: new Date()
-                });
-
-                msjExito.innerText = "¡Cuenta creada! Ahora puedes iniciar sesión.";
-                msjExito.classList.remove('seccion-oculta');
-                document.getElementById('login-email').value = email;
-            } catch (error) {
-                alert("Hubo un error: " + error.message);
-                console.error(error);
-            }
-        };
-
-        // --- 3. CERRAR SESIÓN ---
-        window.cerrarSesionApp = async () => {
-            await signOut(auth);
-            document.getElementById('app-container').classList.add('seccion-oculta');
-            document.getElementById('login-container').classList.remove('seccion-oculta');
-            document.getElementById('login-password').value = '';
-        };
-
-        // --- 4. NAVEGACIÓN ENTRE VISTAS ---
-        window.cambiarVista = (vistaDestino) => {
-            // 1. Creamos una lista con los nombres de todas las pantallas
-            const vistasTotales = ['dashboard', 'cobradores', 'clientes', 'prestamos', 'configuracion'];
-            
-            // 2. Ocultamos todas las pantallas de la lista
-            vistasTotales.forEach(vista => {
-                const elemento = document.getElementById(`vista-${vista}`);
-                if (elemento) {
-                    elemento.classList.add('seccion-oculta');
+                try {
+                    const credenciales = await signInWithEmailAndPassword(auth, email, password);
+                    const docUsuario = await getDoc(doc(db, "usuarios", credenciales.user.uid));
+                    
+                    if (docUsuario.exists()) {
+                        mostrarApp(docUsuario.data().rol, docUsuario.data().nombre);
+                    } else {
+                        throw new Error("El usuario no tiene un rol asignado.");
+                    }
+                } catch (error) {
+                    msjError.innerText = "Error: Verifica tu correo y contraseña.";
+                    msjError.classList.remove('seccion-oculta');
+                } finally {
+                    btnSubmit.innerHTML = '<span>Iniciar Sesión</span>';
+                    btnSubmit.disabled = false;
+                    lucide.createIcons();
                 }
             });
-            
-            // 3. Mostramos únicamente la pantalla que el usuario seleccionó
+        }
+
+        window.cerrarSesionApp = async () => { 
+            await signOut(auth); 
+            window.location.reload(); // Recargar limpia la memoria por seguridad
+        };
+
+        // ============================================================================
+        // 3. NAVEGACIÓN Y CONSTRUCCIÓN DE INTERFAZ SEGÚN EL ROL
+        // ============================================================================
+        window.cambiarVista = (vistaDestino) => {
+            const vistasTotales = ['dashboard', 'cobradores', 'clientes', 'prestamos', 'configuracion'];
+            vistasTotales.forEach(vista => {
+                const elemento = document.getElementById(`vista-${vista}`);
+                if (elemento) elemento.classList.add('seccion-oculta');
+            });
             const vistaAMostrar = document.getElementById(`vista-${vistaDestino}`);
-            if (vistaAMostrar) {
-                vistaAMostrar.classList.remove('seccion-oculta');
-            }
-            
-            // Recargamos los iconos de Lucide por si la nueva vista los necesita
+            if (vistaAMostrar) vistaAMostrar.classList.remove('seccion-oculta');
             lucide.createIcons();
         };
 
-        // --- 5. MOSTRAR APLICACIÓN Y MENÚ ---
         function mostrarApp(rol, nombre) {
+            // Ocultar login, mostrar app
             document.getElementById('login-container').classList.add('seccion-oculta');
             document.getElementById('app-container').classList.remove('seccion-oculta');
             document.getElementById('nombre-usuario').innerText = nombre;
             document.getElementById('rol-usuario-texto').innerText = rol;
-            document.getElementById('bienvenida-rol').innerText = `Tu nivel de acceso actual es: ${rol.toUpperCase()}`;
+            
+            // Icono de perfil
+            document.getElementById('icono-rol').innerHTML = `<i data-lucide="${rol==='admin'?'crown':(rol==='cliente'?'user':'briefcase')}" class="w-4 h-4 text-white"></i>`;
 
-            let iconoStr = rol === 'admin' ? 'crown' : (rol === 'cobrador' ? 'briefcase' : 'user');
-            document.getElementById('icono-rol').innerHTML = `<i data-lucide="${iconoStr}" class="w-4 h-4 text-white"></i>`;
-            lucide.createIcons();
-
-            const menuNavegacion = document.getElementById('menu-navegacion');
-            let htmlMenu = '';
+            // Construir menú lateral
+            const menu = document.getElementById('menu-navegacion');
+            let html = '';
             
             if(rol === 'admin') {
-                htmlMenu += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></button>`;
-                htmlMenu += `<button onclick="cambiarVista('cobradores')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="briefcase" class="w-5 h-5"></i><span>Cobradores</span></button>`;
-                htmlMenu += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="users" class="w-5 h-5"></i><span>Clientes</span></button>`;
-                htmlMenu += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="hand-coins" class="w-5 h-5"></i><span>Préstamos</span></button>`;
-                htmlMenu += `<button onclick="cambiarVista('configuracion')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"><i data-lucide="settings" class="w-5 h-5"></i><span>Configuración</span></button>`;
+                html += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></button>`;
+                html += `<button onclick="cambiarVista('cobradores')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="briefcase" class="w-5 h-5"></i><span>Cobradores</span></button>`;
+                html += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="users" class="w-5 h-5"></i><span>Clientes</span></button>`;
+                html += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="banknotes" class="w-5 h-5"></i><span>Préstamos</span></button>`;
+                html += `<button onclick="cambiarVista('configuracion')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="settings" class="w-5 h-5"></i><span>Configuración</span></button>`;
+            } else if (rol === 'cobrador') {
+                html += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="briefcase" class="w-5 h-5"></i><span>Mis Préstamos</span></button>`;
+                html += `<button onclick="cambiarVista('clientes')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="users" class="w-5 h-5"></i><span>Mis Clientes</span></button>`;
+                html += `<button onclick="cambiarVista('prestamos')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="banknotes" class="w-5 h-5"></i><span>Pedir Préstamo</span></button>`;
+            } else if (rol === 'cliente') {
+                html += `<button onclick="cambiarVista('dashboard')" class="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Mi Estado de Cuenta</span></button>`;
             }
+            menu.innerHTML = html;
             
-            menuNavegacion.innerHTML = htmlMenu;
-            lucide.createIcons(); // Recargar iconos del menú
+            // Mostrar la parte correcta del dashboard
+            document.getElementById('dashboard-admin')?.classList.toggle('seccion-oculta', rol !== 'admin');
+            document.getElementById('dashboard-cobrador')?.classList.toggle('seccion-oculta', rol !== 'cobrador');
+            document.getElementById('dashboard-cliente')?.classList.toggle('seccion-oculta', rol !== 'cliente');
+
+            // Cargar datos en tiempo real
+            cargarDatosTablas(rol, auth.currentUser.uid);
+            lucide.createIcons();
         }
 
-        // --- 6. GUARDAR NUEVO CLIENTE ---
+        // ============================================================================
+        // 4. LECTOR MAESTRO DE DATOS (TABLAS EN TIEMPO REAL CON FILTROS)
+        // ============================================================================
+        function cargarDatosTablas(rol, uid) {
+            
+            // A. LISTA DE CLIENTES
+            const tbodyClientes = document.getElementById('tabla-clientes');
+            const selectCliente = document.getElementById('prestamo-cliente');
+            
+            if (rol !== 'cliente') {
+                const queryClientes = rol === 'admin' 
+                    ? collection(db, "clientes") 
+                    : query(collection(db, "clientes"), where("creadoPorId", "==", uid));
+
+                onSnapshot(queryClientes, (snapshot) => {
+                    if(tbodyClientes) tbodyClientes.innerHTML = '';
+                    if(selectCliente) selectCliente.innerHTML = '<option value="" disabled selected>Selecciona un cliente...</option>';
+                    
+                    snapshot.forEach((docSnap) => {
+                        const c = docSnap.data();
+                        if(selectCliente) selectCliente.innerHTML += `<option value="${docSnap.id}" data-cobrador="${c.creadoPorId}">${c.nombre} (${c.identificacion})</option>`;
+                        if(tbodyClientes) {
+                            const badge = c.estado === 'Activo' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>' : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Inactivo</span>';
+                            if(tbodyClientes) {
+                            const badge = c.estado === 'Activo' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>' : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Inactivo</span>';
+                            
+                            // Si es admin, mostramos botones de Editar y Eliminar
+                            let acciones = '-';
+                            if (rol === 'admin') {
+                                acciones = `
+                                    <div class="flex justify-center space-x-3">
+                                        <button onclick="abrirModalEditarCliente('${docSnap.id}', '${c.nombre}', '${c.identificacion}', '${c.telefono}', '${c.direccion}')" class="text-blue-500 hover:text-blue-700" title="Editar"><i data-lucide="edit" class="w-4 h-4"></i></button>
+                                        <button onclick="eliminarCliente('${docSnap.id}')" class="text-red-500 hover:text-red-700" title="Eliminar"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                                    </div>`;
+                            }
+
+                            tbodyClientes.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-medium">${c.nombre}</td><td class="p-3 text-gray-500">${c.identificacion}</td><td class="p-3">${c.telefono}</td><td class="p-3">${c.correo||'N/A'}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center">${acciones}</td></tr>`;
+                        }
+                        }
+                    });
+                });
+            }
+
+            // B. VISTA DEL CLIENTE (Portal Personal)
+            if (rol === 'cliente') {
+                const infoP = document.getElementById('info-prestamo-cliente');
+                const tbCuotas = document.getElementById('tabla-cuotas-cliente');
+                
+                onSnapshot(query(collection(db, "prestamos"), where("clienteId", "==", uid)), (snap) => {
+                    if (snap.empty) { 
+                        infoP.innerHTML = `<p class="text-center text-gray-500">No tienes préstamos activos.</p>`; 
+                        return; 
+                    }
+                    // Buscamos el préstamo activo del cliente
+                    const p = snap.docs.find(d => d.data().estado !== "Rechazado")?.data();
+                    
+                    if(p) {
+                        infoP.innerHTML = `
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                                <div><p class="text-sm text-gray-500">Monto Aprobado</p><p class="text-xl font-bold text-gray-800">$${p.montoCapital.toFixed(2)}</p></div>
+                                <div><p class="text-sm text-gray-500">Total a Pagar</p><p class="text-xl font-bold text-gray-800">$${p.totalAPagar.toFixed(2)}</p></div>
+                                <div><p class="text-sm text-gray-500">Balance Pendiente</p><p class="text-xl font-bold text-blue-600">$${p.balancePendiente.toFixed(2)}</p></div>
+                                <div><p class="text-sm text-gray-500">Estado</p><p class="text-lg font-semibold text-green-600">${p.estado}</p></div>
+                            </div>`;
+                        
+                        tbCuotas.innerHTML = '';
+                        p.planDePagos.forEach(cuota => {
+                            const b = cuota.estado === 'Pagado' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>' : '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                            tbCuotas.innerHTML += `<tr class="border-b"><td class="p-3">Cuota ${cuota.cuota}</td><td class="p-3 text-gray-500">${cuota.fecha}</td><td class="p-3 font-semibold">$${cuota.monto.toFixed(2)}</td><td class="p-3 text-center">${b}</td></tr>`;
+                        });
+                    }
+                });
+            } 
+            
+            // C. VISTA DEL COBRADOR (Dashboard Operativo)
+            else if (rol === 'cobrador') {
+                const tDashCob = document.getElementById('tabla-dashboard-cobrador');
+                
+                // IMPORTANTE: Ahora filtramos por cobradorId
+                onSnapshot(query(collection(db, "prestamos"), where("cobradorId", "==", uid)), (snap) => {
+                    if(tDashCob) {
+                        tDashCob.innerHTML = '';
+                        
+                        if (snap.empty) {
+                            tDashCob.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500">No tienes préstamos asignados a tu ruta.</td></tr>`;
+                            return;
+                        }
+
+                        snap.forEach((docSnap) => {
+                            const p = docSnap.data();
+                            const badge = p.estado === 'Activo' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>' : `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">${p.estado}</span>`;
+                            const boton = p.estado === 'Activo' ? `<button onclick="abrirModalPago('${docSnap.id}', '${p.nombreCliente}', ${p.valorCuota})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium">Cobrar</button>` : '-';
+                            tDashCob.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3">$${p.totalAPagar.toFixed(2)}</td><td class="p-3 text-blue-700 font-bold">$${p.balancePendiente.toFixed(2)}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center">${boton}</td></tr>`;
+                        });
+                        lucide.createIcons(); // Cargamos los iconos si los hay
+                    }
+                });
+            }
+            
+            // D. VISTA DEL ADMINISTRADOR (Control Total y Estadísticas)
+            else if (rol === 'admin') {
+                
+                // 1. Estadísticas de Pagos (Total Cobrado) y Tabla de Pendientes
+                // Quitamos el filtro 'where' para traer TODOS los pagos y poder sumar los aprobados
+                onSnapshot(collection(db, "pagos"), (snap) => {
+                    const tPagos = document.getElementById('tabla-pagos-admin');
+                    if (tPagos) tPagos.innerHTML = '';
+                    
+                    let totalCobrado = 0;
+                    let hayPendientes = false;
+
+                    snap.forEach((d) => {
+                        const p = d.data();
+                        
+                        // Si está aprobado, lo sumamos a la tarjeta
+                        if (p.estado === "Aprobado") {
+                            totalCobrado += p.montoPagado;
+                        } 
+                        // Si está pendiente, lo dibujamos en la tabla
+                        else if (p.estado === "Pendiente de Aprobación") {
+                            hayPendientes = true;
+                            if (tPagos) {
+                                tPagos.innerHTML += `<tr><td class="p-3">${new Date(p.fechaRegistro).toLocaleDateString()}</td><td class="p-3">${p.cobradorNombre}</td><td class="p-3 text-xs text-gray-400">${p.prestamoId.substring(0,6)}...</td><td class="p-3 text-green-600 font-bold">$${p.montoPagado.toFixed(2)}</td><td class="p-3"><button onclick="aprobarPago('${d.id}', '${p.prestamoId}', ${p.montoPagado})" class="bg-green-500 text-white p-1 rounded hover:bg-green-600 mr-1" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button><button onclick="rechazarPago('${d.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button></td></tr>`;
+                            }
+                        }
+                    });
+                    
+                    // Actualizamos la tarjeta de Total Cobrado
+                    const statCobrado = document.getElementById('stat-cobrado');
+                    if (statCobrado) statCobrado.innerText = `$${totalCobrado.toFixed(2)}`;
+
+                    if (!hayPendientes && tPagos) {
+                        tPagos.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500"><i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-green-400"></i>No hay pagos pendientes de aprobación.</td></tr>`;
+                    }
+                    lucide.createIcons();
+                });
+                
+                // 2. Estadísticas de Préstamos (Capital Total Prestado) y Lista
+                onSnapshot(collection(db, "prestamos"), (snap) => {
+                    const tPres = document.getElementById('tabla-prestamos');
+                    if(tPres) tPres.innerHTML = '';
+                    
+                    let totalPrestado = 0;
+
+                    snap.forEach((d) => {
+                        const p = d.data();
+                        
+                        // Sumamos al total solo si el préstamo está Activo o Pagado (el dinero salió de caja)
+                        if (p.estado === 'Activo' || p.estado === 'Pagado Completamente') {
+                            totalPrestado += p.montoCapital;
+                        }
+
+                        let badge = '', boton = '-';
+                        if (p.estado === 'Activo') {
+                            badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>';
+                            boton = '<span class="text-xs text-gray-400">Aprobado</span>';
+                        } else if (p.estado === 'Rechazado') {
+                            badge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Rechazado</span>';
+                            boton = '<span class="text-xs text-gray-400">Rechazado</span>';
+                        } else if (p.estado === 'Pagado Completamente') {
+                            badge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Saldado</span>';
+                            boton = '<span class="text-xs text-gray-400">Completado</span>';
+                        } else {
+                            badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                            boton = `
+                                <div class="flex justify-center space-x-2">
+                                    <button onclick="aprobarPrestamo('${d.id}')" class="bg-green-500 text-white p-1 rounded hover:bg-green-600" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                    <button onclick="rechazarPrestamo('${d.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                </div>`;
+                        }
+                        
+                        if(tPres) {
+                            // Agregamos el icono de basura rojo independientemente del estado del préstamo
+                        const btnEliminarPrestamo = `<button onclick="eliminarPrestamo('${d.id}')" class="text-red-400 hover:text-red-600 ml-3" title="Eliminar Préstamo (Solo Accidentes)"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                        
+                        if(tPres) {
+                            tPres.innerHTML += `<tr><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3 font-medium text-blue-700">$${p.totalAPagar.toFixed(2)}</td><td class="p-3">${p.cantidadCuotas} cuotas</td><td class="p-3 text-xs text-gray-500">${p.creadoPorNombre}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center flex items-center justify-center">${boton} ${btnEliminarPrestamo}</td></tr>`;
+                        }
+                        }
+                    });
+                    
+                    // Actualizamos la tarjeta de Total Prestado
+                    const statPrestado = document.getElementById('stat-prestado');
+                    if (statPrestado) statPrestado.innerText = `$${totalPrestado.toFixed(2)}`;
+                    lucide.createIcons();
+                });
+
+                // 3. Conteo de Clientes Activos
+                onSnapshot(collection(db, "clientes"), (snap) => {
+                    let clientesActivos = 0;
+                    snap.forEach((docSnap) => {
+                        if (docSnap.data().estado === 'Activo') clientesActivos++;
+                    });
+                    // Actualizamos la tarjeta de Clientes
+                    const statClientes = document.getElementById('stat-clientes');
+                    if (statClientes) statClientes.innerText = clientesActivos;
+                });
+
+                // 4. Lista de Cobradores
+                onSnapshot(collection(db, "cobradores"), (snap) => {
+                    const tbodyCobradores = document.getElementById('tabla-cobradores');
+                    if(tbodyCobradores) {
+                        tbodyCobradores.innerHTML = '';
+                        snap.forEach((docSnap) => {
+                            const cob = docSnap.data();
+                            tbodyCobradores.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-medium">${cob.nombre}</td><td class="p-3">${cob.telefono}</td><td class="p-3 text-blue-600">${cob.ruta}</td><td class="p-3 text-center"><span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span></td></tr>`;
+                        });
+                    }
+                });
+            }
+        }
+
+        // ============================================================================
+        // 5. REGISTRO DE CUENTAS (CLIENTES Y COBRADORES)
+        // ============================================================================
         const formCliente = document.getElementById('form-cliente');
-        formCliente.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btnGuardar = document.getElementById('btn-guardar-cliente');
-            btnGuardar.innerText = 'Guardando...';
-            btnGuardar.disabled = true;
+        if (formCliente) {
+            formCliente.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-guardar-cliente');
+                btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i><span>Guardando...</span>';
+                
+                const c = document.getElementById('cliente-correo').value;
+                const p = document.getElementById('cliente-password').value;
 
-            // Recopilamos todos los datos del formulario
-            const nuevoCliente = {
-                nombre: document.getElementById('cliente-nombre').value,
-                identificacion: document.getElementById('cliente-identificacion').value,
-                telefono: document.getElementById('cliente-telefono').value,
-                correo: document.getElementById('cliente-correo').value,
-                direccion: document.getElementById('cliente-direccion').value,
-                estado: "Activo",
-                fechaRegistro: new Date()
-            };
+                try {
+                    const cred = await createUserWithEmailAndPassword(authSecundario, c, p);
+                    await signOut(authSecundario);
 
-            try {
-                await addDoc(collection(db, "clientes"), nuevoCliente);
-                alert("¡Cliente registrado con éxito en la base de datos!");
-                formCliente.reset();
-            } catch (error) {
-                console.error(error);
-                alert("Error: " + error.message);
-            } finally {
-                btnGuardar.innerText = 'Guardar Cliente';
-                btnGuardar.disabled = false;
+                    // Guardar rol en Auth
+                    await setDoc(doc(db, "usuarios", cred.user.uid), { 
+                        nombre: document.getElementById('cliente-nombre').value, email: c, rol: "cliente" 
+                    });
+                    
+                    // Guardar Perfil del cliente
+                    await setDoc(doc(db, "clientes", cred.user.uid), {
+                        nombre: document.getElementById('cliente-nombre').value,
+                        identificacion: document.getElementById('cliente-identificacion').value,
+                        telefono: document.getElementById('cliente-telefono').value,
+                        correo: c,
+                        direccion: document.getElementById('cliente-direccion').value,
+                        creadoPorId: auth.currentUser.uid, 
+                        creadoPorNombre: document.getElementById('nombre-usuario').innerText,
+                        estado: "Activo"
+                    });
+                    alert("¡Cliente creado exitosamente!");
+                    formCliente.reset();
+                } catch(error) { alert("Error al registrar cliente: " + error.message); }
+                finally { btn.disabled = false; btn.innerHTML = '<i data-lucide="save" class="w-4 h-4"></i><span>Crear Cliente</span>'; lucide.createIcons(); }
+            });
+        }
+
+        const formCobrador = document.getElementById('form-cobrador');
+        if (formCobrador) {
+            formCobrador.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-guardar-cobrador');
+                btn.disabled = true; btn.innerHTML = 'Guardando...';
+
+                const n = document.getElementById('cobrador-nombre').value;
+                const t = document.getElementById('cobrador-telefono').value;
+                const c = document.getElementById('cobrador-correo').value;
+                const p = document.getElementById('cobrador-password').value;
+                const r = document.getElementById('cobrador-ruta').value;
+
+                try {
+                    const cred = await createUserWithEmailAndPassword(authSecundario, c, p);
+                    await signOut(authSecundario);
+                    await setDoc(doc(db, "usuarios", cred.user.uid), { nombre: n, email: c, rol: "cobrador", fechaCreacion: new Date() });
+                    await setDoc(doc(db, "cobradores", cred.user.uid), { nombre: n, telefono: t, correo: c, ruta: r, estado: "Activo", fechaRegistro: new Date() });
+                    alert("¡Cobrador creado!");
+                    formCobrador.reset();
+                } catch (e) { alert("Error: " + e.message); }
+                finally { btn.disabled = false; btn.innerHTML = 'Crear Perfil'; }
+            });
+        }
+
+        // ============================================================================
+        // 6. LÓGICA DE PRÉSTAMOS
+        // ============================================================================
+        
+        // A. Delegación de eventos para la Calculadora Mágica
+        function calcularResumen() {
+            const m = parseFloat(document.getElementById('prestamo-monto')?.value) || 0;
+            const i = parseFloat(document.getElementById('prestamo-interes')?.value) || 0;
+            const c = parseInt(document.getElementById('prestamo-cuotas')?.value) || 1;
+            const interesGen = m * (i / 100);
+            const total = m + interesGen;
+            
+            const rCap = document.getElementById('resumen-capital');
+            if (rCap) {
+                rCap.innerText = `$${m.toFixed(2)}`;
+                document.getElementById('resumen-interes').innerText = `+$${interesGen.toFixed(2)}`;
+                document.getElementById('resumen-total').innerText = `$${total.toFixed(2)}`;
+                document.getElementById('resumen-cuota').innerText = `$${(total / c).toFixed(2)}`;
+            }
+        }
+
+        document.addEventListener('input', (e) => {
+            if (['prestamo-monto', 'prestamo-interes', 'prestamo-cuotas'].includes(e.target.id)) {
+                calcularResumen();
             }
         });
 
-        // --- 7. CARGAR Y MOSTRAR CLIENTES EN TIEMPO REAL ---
-        const tbodyClientes = document.getElementById('tabla-clientes');
-        
-        if (tbodyClientes) {
-            // onSnapshot escucha los cambios en la carpeta "clientes" todo el tiempo
-            onSnapshot(collection(db, "clientes"), (snapshot) => {
-                tbodyClientes.innerHTML = ''; // Limpiamos la tabla antes de llenarla
+        // B. Constructor de Calendario de Pagos
+        function generarFechas(fecha, frec, cuotas, valor) {
+            let fechas = []; let fActual = new Date(fecha + 'T12:00:00');
+            for (let x = 1; x <= cuotas; x++) {
+                let fNueva = new Date(fActual);
+                if (frec === 'Diario') fNueva.setDate(fNueva.getDate() + 1);
+                if (frec === 'Semanal') fNueva.setDate(fNueva.getDate() + 7);
+                if (frec === 'Quincenal') fNueva.setDate(fNueva.getDate() + 15);
+                if (frec === 'Mensual') fNueva.setMonth(fNueva.getMonth() + 1);
+                fechas.push({ cuota: x, fecha: fNueva.toISOString().split('T')[0], monto: valor, estado: "Pendiente" });
+                fActual = fNueva;
+            }
+            return fechas;
+        }
+
+        // C. Registrar Préstamo (Con regla anti-sobreendeudamiento)
+        const formPrestamo = document.getElementById('form-prestamo');
+        if (formPrestamo) {
+            formPrestamo.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-guardar-prestamo');
+                btn.disabled = true;
+                const sel = document.getElementById('prestamo-cliente');
                 
-                if (snapshot.empty) {
-                    tbodyClientes.innerHTML = `
-                        <tr>
-                            <td colspan="5" class="p-8 text-center text-gray-500 font-medium">
-                                No hay clientes registrados aún. ¡Agrega el primero arriba!
-                            </td>
-                        </tr>`;
+                // Regla de Negocio: 1 Préstamo Activo a la vez
+                const qCheck = query(collection(db, "prestamos"), where("clienteId", "==", sel.value));
+                const checkSnap = await getDocs(qCheck);
+                let bloqueado = false;
+                
+                checkSnap.forEach(docSnap => {
+                    const est = docSnap.data().estado;
+                    if (est === "Activo" || est === "Pendiente de Aprobación") bloqueado = true;
+                });
+
+                if (bloqueado) {
+                    alert("⛔ DENEGADO: El cliente tiene un préstamo Activo o Pendiente. Debe saldarlo primero.");
+                    btn.disabled = false;
                     return;
                 }
 
-                // Por cada cliente en la base de datos, creamos una fila
-                snapshot.forEach((docCliente) => {
-                    const cliente = docCliente.data();
-                    
-                    // Diseñamos una pequeña etiqueta verde o roja para el estado
-                    const badgeEstado = cliente.estado === 'Activo' 
-                        ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold tracking-wide">Activo</span>' 
-                        : '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold tracking-wide">Inactivo</span>';
-
-                    // Insertamos los datos en HTML
-                    const fila = `
-                        <tr class="hover:bg-blue-50/50 transition-colors">
-                            <td class="p-3 font-semibold text-gray-800">${cliente.nombre}</td>
-                            <td class="p-3 text-gray-500">${cliente.identificacion}</td>
-                            <td class="p-3">${cliente.telefono}</td>
-                            <td class="p-3">${cliente.correo || 'N/A'}</td>
-                            <td class="p-3 text-center">${badgeEstado}</td>
-                        </tr>
-                    `;
-                    tbodyClientes.innerHTML += fila;
-                });
+                // Cálculo Final
+                const m = parseFloat(document.getElementById('prestamo-monto').value);
+                const i = parseFloat(document.getElementById('prestamo-interes').value);
+                const c = parseInt(document.getElementById('prestamo-cuotas').value);
+                const intGen = m * (i/100); const total = m + intGen; const vCuota = total / c;
                 
-                lucide.createIcons(); // Recargamos los iconos por si acaso
+                const fIni = document.getElementById('prestamo-fecha-inicio').value;
+                const frec = document.getElementById('prestamo-frecuencia').value;
+                const plan = generarFechas(fIni, frec, c, vCuota);
+                
+                const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
+                const estadoIni = rolActual === 'admin' ? "Activo" : "Pendiente de Aprobación";
+
+                try {
+                    // Extraemos el ID del cobrador dueño de este cliente
+                    const cobradorAsignado = sel.options[sel.selectedIndex].getAttribute('data-cobrador');
+
+                    await addDoc(collection(db, "prestamos"), {
+                        clienteId: sel.value, 
+                        nombreCliente: sel.options[sel.selectedIndex].text,
+                        creadoPorId: auth.currentUser.uid, 
+                        creadoPorNombre: document.getElementById('nombre-usuario').innerText,
+                        cobradorId: cobradorAsignado, // <--- EL NUEVO ENLACE DE SEGURIDAD
+                        montoCapital: m, interesPorcentaje: i, frecuencia: frec, cantidadCuotas: c, fechaPrimerPago: fIni,
+                        interesTotalGenerado: intGen, totalAPagar: total, valorCuota: vCuota, balancePendiente: total,
+                        planDePagos: plan, estado: estadoIni, fechaRegistro: new Date()
+                    });
+                    
+                    alert(estadoIni === "Activo" ? "¡Préstamo aprobado!" : "¡Préstamo enviado a aprobación!");
+                    formPrestamo.reset(); 
+                    calcularResumen();
+                } catch(err) { alert("Error: " + err.message); }
+                finally { btn.disabled = false; }
+            });
+        }
+
+        // ============================================================================
+        // 7. SISTEMA DE PAGOS, TICKETS Y APROBACIONES
+        // ============================================================================
+        
+        // A. Manejo del Modal
+        window.abrirModalPago = (id, nombre, cuota) => {
+            document.getElementById('modal-pago').classList.remove('hidden');
+            document.getElementById('pago-prestamo-id').value = id;
+            document.getElementById('modal-pago-cliente').innerText = `Cliente: ${nombre}`;
+            document.getElementById('pago-monto').value = cuota.toFixed(2);
+        };
+        window.cerrarModalPago = () => { document.getElementById('modal-pago').classList.add('hidden'); };
+
+        // B. Generador de Ticket (Impresión Térmica)
+        window.imprimirTicket = (fecha, cliente, monto, cobrador) => {
+            const ventanaTicket = window.open('', '_blank', 'width=350,height=500');
+            ventanaTicket.document.write(`
+                <html>
+                <head>
+                    <title>Ticket de Pago</title>
+                    <style>
+                        body { font-family: 'Courier New', Courier, monospace; width: 280px; margin: 0 auto; padding: 20px 10px; color: #000; }
+                        h2 { text-align: center; margin: 0; font-size: 20px; border-bottom: 1px dashed #000; padding-bottom: 10px; }
+                        .info { margin-top: 15px; font-size: 14px; }
+                        .info div { display: flex; justify-content: space-between; margin-bottom: 5px; }
+                        .monto-total { text-align: center; font-size: 24px; font-weight: bold; margin: 20px 0; border-top: 1px dashed #000; border-bottom: 1px dashed #000; padding: 10px 0; }
+                        .footer { text-align: center; font-size: 12px; margin-top: 20px; color: #555; }
+                    </style>
+                </head>
+                <body>
+                    <h2>LORHELS PRESTA</h2>
+                    <div class="info">
+                        <div><span>Fecha:</span> <span>${fecha}</span></div>
+                        <div><span>Recibo #:</span> <span>${Math.floor(Math.random() * 90000) + 10000}</span></div>
+                        <br>
+                        <div><span>Cliente:</span></div>
+                        <div style="font-weight: bold;">${cliente.replace('Cliente: ', '')}</div>
+                        <div><span>Atendido por:</span> <span>${cobrador}</span></div>
+                    </div>
+                    <div class="monto-total">VALOR: $${monto.toFixed(2)}</div>
+                    <div class="footer">El pago está sujeto a verificación.<br>¡Gracias por preferirnos!</div>
+                    <script> window.onload = function() { window.print(); window.close(); } <\/script>
+                </body>
+                </html>
+            `);
+            ventanaTicket.document.close();
+        };
+
+        // C. Guardar Pago (Cobrador)
+        document.getElementById('form-pago')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btn-guardar-pago');
+            btnSubmit.disabled = true; btnSubmit.innerText = "Procesando...";
+
+            const prestamoId = document.getElementById('pago-prestamo-id').value;
+            const montoPagado = parseFloat(document.getElementById('pago-monto').value);
+            const nombreCliente = document.getElementById('modal-pago-cliente').innerText;
+            const nombreCobrador = document.getElementById('nombre-usuario').innerText;
+
+            try {
+                await addDoc(collection(db, "pagos"), {
+                    prestamoId: prestamoId,
+                    cobradorId: auth.currentUser.uid, cobradorNombre: nombreCobrador,
+                    montoPagado: montoPagado, estado: "Pendiente de Aprobación", 
+                    fechaRegistro: new Date().toISOString()
+                });
+                cerrarModalPago();
+                if (confirm("¡Pago registrado! ¿Deseas imprimir el Ticket de Pago?")) {
+                    imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, nombreCobrador);
+                }
+            } catch (error) { alert("Error al enviar pago: " + error.message); } 
+            finally { btnSubmit.disabled = false; btnSubmit.innerText = "Enviar a Aprobación"; }
+        });
+
+        // D. Administrador: Aprobar / Rechazar Operaciones
+        window.aprobarPrestamo = async (id) => { 
+            if(confirm("¿Aprobar Préstamo?")) await updateDoc(doc(db, "prestamos", id), { estado: "Activo" }); 
+        };
+        window.rechazarPrestamo = async (id) => { 
+            if(confirm("¿Rechazar Préstamo?")) await updateDoc(doc(db, "prestamos", id), { estado: "Rechazado" }); 
+        };
+        window.rechazarPago = async (id) => { 
+            if(confirm("¿Rechazar este pago?")) await updateDoc(doc(db, "pagos", id), { estado: "Rechazado" }); 
+        };
+
+        // ¡MAGIA AVANZADA! Aprobar pago, tachar cuota y descontar sobrante al final
+        window.aprobarPago = async (idPago, prestamoId, montoPagado) => {
+            if (!confirm(`¿Aprobar pago de $${montoPagado}? El sistema calculará la amortización automáticamente.`)) return;
+            try {
+                // 1. Aprobamos el recibo de pago
+                await updateDoc(doc(db, "pagos", idPago), { estado: "Aprobado" });
+                
+                // 2. Traemos el préstamo para analizar las cuotas
+                const pref = doc(db, "prestamos", prestamoId);
+                const pDoc = await getDoc(pref);
+                
+                if (pDoc.exists()) {
+                    const datos = pDoc.data();
+                    let nBalance = datos.balancePendiente - montoPagado;
+                    if (nBalance < 0) nBalance = 0;
+
+                    let planActualizado = [...datos.planDePagos];
+                    let sobrante = montoPagado; // El dinero que tenemos en la mano para repartir
+
+                    // PASO A: Cubrir la cuota ACTUAL (la primera que encuentre pendiente)
+                    for (let i = 0; i < planActualizado.length; i++) {
+                        if (planActualizado[i].estado === "Pendiente") {
+                            if (sobrante >= planActualizado[i].monto) {
+                                // Pagó la cuota completa
+                                sobrante -= planActualizado[i].monto;
+                                planActualizado[i].estado = "Pagado";
+                                break; 
+                            } else {
+                                // Pago incompleto (Solo hizo un abono a esta cuota)
+                                planActualizado[i].monto -= sobrante;
+                                sobrante = 0;
+                                break;
+                            }
+                        }
+                    }
+
+                    // PASO B: Si pagó de más, el sobrante ataca a la ÚLTIMA cuota (de atrás hacia adelante)
+                    if (sobrante > 0) {
+                        for (let i = planActualizado.length - 1; i >= 0; i--) {
+                            if (planActualizado[i].estado === "Pendiente") {
+                                if (sobrante >= planActualizado[i].monto) {
+                                    // El sobrante fue tan grande que eliminó la última cuota entera
+                                    sobrante -= planActualizado[i].monto;
+                                    planActualizado[i].monto = 0;
+                                    planActualizado[i].estado = "Pagado"; 
+                                } else {
+                                    // Descuento parcial a la última cuota
+                                    planActualizado[i].monto -= sobrante;
+                                    sobrante = 0;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // 3. Guardamos los nuevos cálculos en Firebase
+                    await updateDoc(pref, {
+                        balancePendiente: nBalance,
+                        planDePagos: planActualizado, // Guardamos el array con los nuevos descuentos
+                        estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
+                    });
+                    
+                    alert("Pago procesado con éxito. El plan de pagos se ajustó automáticamente.");
+                }
+            } catch (error) { alert("Error: " + error.message); }
+        };
+
+        // ============================================================================
+        // 8. EDICIÓN Y ELIMINACIÓN (SOLO ADMINISTRADOR)
+        // ============================================================================
+        
+        // ELIMINAR PRESTAMO
+        window.eliminarPrestamo = async (id) => {
+            if (!confirm("⚠️ PELIGRO: ¿Estás seguro de que deseas ELIMINAR este préstamo de la base de datos? Hazlo solo si se duplicó o creó por accidente.")) return;
+            try {
+                await deleteDoc(doc(db, "prestamos", id));
+                alert("Préstamo eliminado exitosamente.");
+            } catch (error) { alert("Error al eliminar: " + error.message); }
+        };
+
+        // ELIMINAR CLIENTE
+        window.eliminarCliente = async (id) => {
+            if (!confirm("⚠️ PELIGRO: ¿Estás seguro de eliminar este cliente? Perderás su historial en la tabla.")) return;
+            try {
+                await deleteDoc(doc(db, "clientes", id));
+                alert("Cliente eliminado del registro.");
+            } catch (error) { alert("Error al eliminar: " + error.message); }
+        };
+
+        // EDITAR CLIENTE (MODAL Y ACTUALIZACIÓN)
+        window.abrirModalEditarCliente = (id, nombre, iden, tel, dir) => {
+            document.getElementById('modal-editar-cliente').classList.remove('hidden');
+            document.getElementById('edit-cliente-id').value = id;
+            document.getElementById('edit-cliente-nombre').value = nombre;
+            document.getElementById('edit-cliente-identificacion').value = iden;
+            document.getElementById('edit-cliente-telefono').value = tel;
+            document.getElementById('edit-cliente-direccion').value = dir;
+        };
+
+        window.cerrarModalEditarCliente = () => {
+            document.getElementById('modal-editar-cliente').classList.add('hidden');
+        };
+
+        const formEditarCliente = document.getElementById('form-editar-cliente');
+        if (formEditarCliente) {
+            formEditarCliente.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-guardar-edicion');
+                btn.disabled = true; btn.innerText = "Guardando...";
+
+                const id = document.getElementById('edit-cliente-id').value;
+                try {
+                    await updateDoc(doc(db, "clientes", id), {
+                        nombre: document.getElementById('edit-cliente-nombre').value,
+                        identificacion: document.getElementById('edit-cliente-identificacion').value,
+                        telefono: document.getElementById('edit-cliente-telefono').value,
+                        direccion: document.getElementById('edit-cliente-direccion').value
+                    });
+                    alert("Información del cliente actualizada correctamente.");
+                    cerrarModalEditarCliente();
+                } catch(error) { 
+                    alert("Error al actualizar: " + error.message); 
+                } finally {
+                    btn.disabled = false; btn.innerText = "Guardar Cambios";
+                }
+            });
+        }
+
+        // ============================================================================
+        // 9. BUSCADOR EN TIEMPO REAL (FILTRO DE TABLA CLIENTES)
+        // ============================================================================
+        const buscadorClientes = document.getElementById('buscador-clientes');
+        
+        if (buscadorClientes) {
+            buscadorClientes.addEventListener('input', (e) => {
+                // Convertimos lo que escribes a minúsculas para que no importe si usas mayúsculas
+                const textoBusqueda = e.target.value.toLowerCase();
+                
+                // Seleccionamos todas las filas de la tabla de clientes
+                const filas = document.querySelectorAll('#tabla-clientes tr');
+
+                filas.forEach(fila => {
+                    // Si es la fila que dice "No hay clientes" (solo tiene 1 columna), la saltamos
+                    if (fila.cells.length <= 1) return;
+
+                    // El nombre está en la columna 0, la identificación en la columna 1
+                    const nombre = fila.cells[0].textContent.toLowerCase();
+                    const identificacion = fila.cells[1].textContent.toLowerCase();
+
+                    // Si el nombre O la cédula incluyen el texto que escribiste, mostramos la fila
+                    if (nombre.includes(textoBusqueda) || identificacion.includes(textoBusqueda)) {
+                        fila.style.display = ''; // Vacío significa que usa su estado normal (visible)
+                    } else {
+                        fila.style.display = 'none'; // Ocultamos la fila
+                    }
+                });
             });
         }
     </script>
