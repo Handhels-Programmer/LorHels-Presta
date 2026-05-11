@@ -170,6 +170,29 @@
                             </table>
                         </div>
                     </div>
+
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 mt-8 flex items-center space-x-2">
+                        <i data-lucide="history" class="w-5 h-5 text-green-600"></i>
+                        <span>Historial de Cobros Realizados</span>
+                    </h3>
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 w-full mb-10">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                        <th class="p-3 border-b font-medium">Fecha Cobro</th>
+                                        <th class="p-3 border-b font-medium">Cliente</th>
+                                        <th class="p-3 border-b font-medium">Cobrador</th>
+                                        <th class="p-3 border-b font-medium">Monto</th>
+                                        <th class="p-3 border-b font-medium text-center">Ticket</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-historial-pagos-admin" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div id="dashboard-cobrador" class="seccion-oculta">
@@ -565,9 +588,10 @@
                             <thead>
                                 <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
                                     <th class="p-3 border-b font-medium">Detalle</th>
-                                    <th class="p-3 border-b font-medium">Vencimiento</th>
-                                    <th class="p-3 border-b font-medium">Monto</th>
-                                    <th class="p-3 border-b font-medium text-center">Estado</th>
+                                    <th class="p-3 border-b font-medium text-xs">Vencimiento</th>
+                                    <th class="p-3 border-b font-medium text-xs">Recibido</th>
+                                    <th class="p-3 border-b font-medium text-xs">Monto</th>
+                                    <th class="p-3 border-b font-medium text-xs text-center">Estado</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-historial-cuerpo" class="text-sm text-gray-600 divide-y divide-gray-100">
@@ -820,8 +844,9 @@
 
                             if (cuota.estado === 'Pagado') {
                                 badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>';
-                                // ¡AQUÍ ESTÁ EL BOTÓN DE IMPRESIÓN PARA EL CLIENTE!
-                                btnImprimir = `<button onclick="imprimirComprobanteCliente('${p.nombreCliente}', ${cuota.cuota}, '${cuota.fecha}', ${cuota.monto})" class="ml-2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1 rounded-full" title="Imprimir Recibo"><i data-lucide="printer" class="w-4 h-4 inline"></i></button>`;
+                                const fPagoRealImpresion = cuota.fechaPagoReal ? cuota.fechaPagoReal : 'N/A';
+                                
+                                btnImprimir = `<button onclick="imprimirComprobanteCliente('${p.nombreCliente}', ${cuota.cuota}, '${cuota.fecha}', '${fPagoRealImpresion}', ${cuota.monto})" class="ml-2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1 rounded-full" title="Imprimir Recibo"><i data-lucide="printer" class="w-4 h-4 inline"></i></button>`;
                             } else {
                                 badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
                             }
@@ -885,45 +910,65 @@
 
                 // Función que redibuja los pagos cuando cambias el mes
                 const renderizarPagosAdmin = () => {
-                    const tPagos = document.getElementById('tabla-pagos-admin');
+                    const tPendientes = document.getElementById('tabla-pagos-admin');
+                    const tHistorial = document.getElementById('tabla-historial-pagos-admin');
                     const statCobrado = document.getElementById('stat-cobrado');
-                    if (tPagos) tPagos.innerHTML = '';
+                    const mesSeleccionado = mesInput ? mesInput.value : ''; 
+
+                    if (tPendientes) tPendientes.innerHTML = '';
+                    if (tHistorial) tHistorial.innerHTML = '';
                     
-                    let totalCobrado = 0;
+                    let totalCobradoMes = 0;
                     let hayPendientes = false;
-                    const mesSeleccionado = mesInput ? mesInput.value : ''; // Formato: "2024-05"
 
                     pagosTotalesAdmin.forEach(p => {
-                        // Extraemos "AAAA-MM" de la fecha del pago
-                        const mesDelPago = p.fechaRegistro ? p.fechaRegistro.substring(0, 7) : ''; 
-                        const cumpleFiltroMes = !mesSeleccionado || mesSeleccionado === mesDelPago;
+                        const fechaObj = new Date(p.fechaRegistro);
+                        const mesDelPago = p.fechaRegistro.substring(0, 7); // Formato "YYYY-MM"
+                        const cumpleFiltro = !mesSeleccionado || mesSeleccionado === mesDelPago;
+                        const fechaBonita = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
 
-                        // Sumar ganancias SI ES APROBADO Y ES DEL MES SELECCIONADO
-                        if (p.estado === "Aprobado") {
-                            if (cumpleFiltroMes) totalCobrado += p.montoPagado;
-                        } 
-                        // Dibujar en tabla SI ES PENDIENTE (Los mostramos todos para que no se te olvide aprobarlos)
-                        else if (p.estado === "Pendiente de Aprobación") {
+                        if (p.estado === "Pendiente de Aprobación") {
                             hayPendientes = true;
-                            if (tPagos) {
-                                const fechaBonita = new Date(p.fechaRegistro).toLocaleDateString();
-                                tPagos.innerHTML += `
-                                    <tr class="hover:bg-gray-50">
+                            if (tPendientes) {
+                                tPendientes.innerHTML += `
+                                    <tr>
                                         <td class="p-3">${fechaBonita}</td>
+                                        <td class="p-3 font-medium">${p.clienteNombre || 'Cliente'}</td>
                                         <td class="p-3">${p.cobradorNombre}</td>
-                                        <td class="p-3 text-xs text-gray-400" title="${p.prestamoId}">${p.prestamoId.substring(0,6)}...</td>
                                         <td class="p-3 text-green-600 font-bold">$${p.montoPagado.toFixed(2)}</td>
-                                        <td class="p-3 flex justify-center space-x-2">
-                                            <button onclick="aprobarPago('${p.id}', '${p.prestamoId}', ${p.montoPagado})" class="bg-green-500 text-white p-1 rounded hover:bg-green-600" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button>
-                                            <button onclick="rechazarPago('${p.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                        <td class="p-3 text-center">
+                                            <button onclick="aprobarPago('${p.id}', '${p.prestamoId}', ${p.montoPagado})" class="bg-green-500 text-white p-1 rounded hover:bg-green-600 mr-1"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                            <button onclick="rechazarPago('${p.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>`;
+                            }
+                        } 
+                        else if (p.estado === "Aprobado" && cumpleFiltro) {
+                            totalCobradoMes += p.montoPagado;
+                            if (tHistorial) {
+                                tHistorial.innerHTML += `
+                                    <tr class="hover:bg-green-50 transition-colors">
+                                        <td class="p-3">${fechaBonita}</td>
+                                        <td class="p-3 font-semibold text-gray-800">${p.clienteNombre || 'Finalizado'}</td>
+                                        <td class="p-3 text-xs text-gray-500">${p.cobradorNombre}</td>
+                                        <td class="p-3 font-bold text-gray-700">$${p.montoPagado.toFixed(2)}</td>
+                                        <td class="p-3 text-center">
+                                            <button onclick="imprimirTicket('${fechaBonita}', '${p.clienteNombre}', ${p.montoPagado}, '${p.cobradorNombre}', false)" class="text-blue-600 hover:text-blue-800 p-1 bg-blue-50 rounded-full transition shadow-sm">
+                                                <i data-lucide="printer" class="w-4 h-4"></i>
+                                            </button>
                                         </td>
                                     </tr>`;
                             }
                         }
                     });
 
-                    if (statCobrado) statCobrado.innerText = `$${totalCobrado.toFixed(2)}`;
-                    if (!hayPendientes && tPagos) tPagos.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500"><i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-green-400"></i>No hay pagos pendientes de aprobación.</td></tr>`;
+                    if (statCobrado) statCobrado.innerText = `$${totalCobradoMes.toFixed(2)}`;
+                    if (!hayPendientes && tPendientes) {
+                        tPendientes.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Todo al día. No hay pagos pendientes.</td></tr>`;
+                    }
+                    if (tHistorial && tHistorial.innerHTML === '') {
+                        tHistorial.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay cobros registrados en este mes.</td></tr>`;
+                    }
                     lucide.createIcons();
                 };
 
@@ -1291,13 +1336,12 @@
             ventanaTicket.document.close();
         };
 
-        // B2. Generador de Comprobante (Para el Portal del Cliente)
-        window.imprimirComprobanteCliente = (cliente, numCuota, fechaCuota, monto) => {
+        // B2. Generador de Comprobante (Para el Portal del Cliente e Historial)
+        window.imprimirComprobanteCliente = (cliente, numCuota, fechaVencimiento, fechaPagoReal, monto) => {
             const ventanaTicket = window.open('', '_blank', 'width=350,height=500');
             
-            // ESCUDO DE SEGURIDAD
             if (!ventanaTicket) {
-                alert("⚠️ Tu navegador bloqueó el comprobante. Por favor, permite las ventanas emergentes (pop-ups) y vuelve a hacer clic en imprimir.");
+                alert("⚠️ Tu navegador bloqueó el comprobante. Por favor, permite las ventanas emergentes (pop-ups).");
                 return;
             }
 
@@ -1326,13 +1370,14 @@
                         <div><span>Cliente:</span></div>
                         <div style="font-weight: bold;">${cliente}</div>
                         <div><span>Concepto:</span> <span>Cuota ${numCuota}</span></div>
-                        <div><span>Vencimiento:</span> <span>${fechaCuota}</span></div>
+                        <div><span>Vencimiento:</span> <span>${fechaVencimiento}</span></div>
+                        <div><span>Pagado el:</span> <span style="font-weight: bold;">${fechaPagoReal}</span></div>
                     </div>
                     <div class="monto-total">VALOR: $${monto.toFixed(2)}</div>
                     
                     <div class="sello">PAGADO</div>
                     
-                    <div class="footer">Este es un comprobante digital auto-generado.<br>¡Gracias por tu pago puntual!</div>
+                    <div class="footer">Este es un comprobante digital auto-generado.<br>¡Gracias por confiar en nosotros!</div>
                     <script> window.onload = function() { window.print(); window.close(); } <\/script>
                 </body>
                 </html>
@@ -1400,120 +1445,120 @@
 
         // C. Guardar Pago (Capturando la fecha manual)
         document.getElementById('form-pago')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const btnSubmit = document.getElementById('btn-guardar-pago');
-            btnSubmit.disabled = true; btnSubmit.innerText = "Procesando...";
+    e.preventDefault();
+    const btnSubmit = document.getElementById('btn-guardar-pago');
+    btnSubmit.disabled = true; 
+    btnSubmit.innerText = "Procesando...";
 
-            const prestamoId = document.getElementById('pago-prestamo-id').value;
-            const montoPagado = parseFloat(document.getElementById('pago-monto').value);
+    const prestamoId = document.getElementById('pago-prestamo-id').value;
+    const montoPagado = parseFloat(document.getElementById('pago-monto').value);
+    
+    // 1. CAPTURAR FECHAS
+    const fechaInput = document.getElementById('pago-fecha').value; // AAAA-MM-DD
+    const fechaRegistroSegura = new Date(fechaInput + 'T12:00:00').toISOString();
+    
+    const [anio, mes, dia] = fechaInput.split('-');
+    const fechaBonita = `${dia}/${mes}/${anio}`; // Para el Ticket y el Historial
+
+    // 2. CAPTURAR INFO DEL MODAL
+    const divClienteHTML = document.getElementById('modal-pago-cliente').innerHTML;
+    const tieneMora = divClienteHTML.includes('recargos por atraso');
+    const nombreCliente = divClienteHTML.split('<br>')[0].replace('Cliente: ', '');
+    
+    const nombreCobrador = document.getElementById('nombre-usuario').innerText;
+    const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
+
+    try {
+        if (rolActual === 'admin') {
+            // --- FLUJO DEL ADMINISTRADOR (AMORTIZACIÓN INMEDIATA) ---
+
+            // A. Guardar el pago (Incluimos clienteNombre para el historial)
+            await addDoc(collection(db, "pagos"), {
+                prestamoId: prestamoId,
+                clienteNombre: nombreCliente, // <--- CRUCIAL para el historial
+                cobradorId: auth.currentUser.uid, 
+                cobradorNombre: "Admin: " + nombreCobrador, 
+                montoPagado: montoPagado, 
+                estado: "Aprobado",
+                fechaRegistro: fechaRegistroSegura
+            });
+
+            // B. Actualizar el Préstamo
+            const pref = doc(db, "prestamos", prestamoId);
+            const pDoc = await getDoc(pref);
             
-            // CAPTURAR LA FECHA MANUAL ELEGIDA
-            const fechaInput = document.getElementById('pago-fecha').value;
-            // Aseguramos una hora media (12:00 PM) para evitar problemas de zona horaria al guardar en Firebase
-            const fechaRegistroSegura = new Date(fechaInput + 'T12:00:00').toISOString();
-            // Formato bonito para el ticket y WhatsApp (DD/MM/YYYY)
-            const [anio, mes, dia] = fechaInput.split('-');
-            const fechaBonita = `${dia}/${mes}/${anio}`;
+            if (pDoc.exists()) {
+                const datos = pDoc.data();
+                let nBalance = datos.balancePendiente - montoPagado;
+                if (nBalance < 0) nBalance = 0;
 
-            const divClienteHTML = document.getElementById('modal-pago-cliente').innerHTML;
-            const tieneMora = divClienteHTML.includes('recargos por atraso');
-            const nombreCliente = divClienteHTML.split('<br>')[0].replace('Cliente: ', '');
-            
-            const nombreCobrador = document.getElementById('nombre-usuario').innerText;
-            const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
+                let planActualizado = [...datos.planDePagos];
+                let sobrante = montoPagado;
 
-            try {
-                if (rolActual === 'admin') {
-                    // 1. FLUJO DEL ADMINISTRADOR: El pago entra ya aprobado
-                    await addDoc(collection(db, "pagos"), {
-                        prestamoId: prestamoId,
-                        cobradorId: auth.currentUser.uid, 
-                        cobradorNombre: "Admin: " + nombreCobrador, 
-                        montoPagado: montoPagado, 
-                        estado: "Aprobado",
-                        fechaRegistro: fechaRegistroSegura // <-- FECHA MANUAL
-                    });
-
-                    // 2. Amortizamos las cuotas instantáneamente
-                    const pref = doc(db, "prestamos", prestamoId);
-                    const pDoc = await getDoc(pref);
-                    
-                    if (pDoc.exists()) {
-                        const datos = pDoc.data();
-                        let nBalance = datos.balancePendiente - montoPagado;
-                        if (nBalance < 0) nBalance = 0;
-
-                        let planActualizado = [...datos.planDePagos];
-                        let sobrante = montoPagado;
-
-                        for (let i = 0; i < planActualizado.length; i++) {
-                            if (planActualizado[i].estado === "Pendiente") {
-                                if (sobrante >= planActualizado[i].monto) {
-                                    sobrante -= planActualizado[i].monto;
-                                    planActualizado[i].estado = "Pagado";
-                                    break; 
-                                } else {
-                                    planActualizado[i].monto -= sobrante;
-                                    sobrante = 0;
-                                    break;
-                                }
-                            }
+                // Tachamos cuotas y registramos FECHA REAL DE COBRO
+                for (let i = 0; i < planActualizado.length; i++) {
+                    if (planActualizado[i].estado === "Pendiente") {
+                        if (sobrante >= planActualizado[i].monto) {
+                            sobrante -= planActualizado[i].monto;
+                            planActualizado[i].estado = "Pagado";
+                            planActualizado[i].fechaPagoReal = fechaBonita; // <--- AUDITORÍA
+                        } else {
+                            planActualizado[i].monto -= sobrante;
+                            sobrante = 0;
+                            break;
                         }
-
-                        if (sobrante > 0) {
-                            for (let i = planActualizado.length - 1; i >= 0; i--) {
-                                if (planActualizado[i].estado === "Pendiente") {
-                                    if (sobrante >= planActualizado[i].monto) {
-                                        sobrante -= planActualizado[i].monto;
-                                        planActualizado[i].monto = 0;
-                                        planActualizado[i].estado = "Pagado"; 
-                                    } else {
-                                        planActualizado[i].monto -= sobrante;
-                                        sobrante = 0;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        await updateDoc(pref, {
-                            balancePendiente: nBalance,
-                            planDePagos: planActualizado,
-                            estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
-                        });
-                    }
-
-                    cerrarModalPago();
-                    
-                    // Pasamos "fechaBonita" en lugar de new Date().toLocaleDateString()
-                    if (confirm("¡Cobro directo procesado con éxito! ¿Deseas IMPRIMIR el recibo en papel?")) {
-                        imprimirTicket(fechaBonita, nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
-                    }
-                    if (confirm("¿Deseas enviar el comprobante digital por WHATSAPP al cliente?")) {
-                        enviarWhatsApp(prestamoId, montoPagado, nombreCliente, "Admin: " + nombreCobrador, tieneMora);
-                    }
-
-                } else {
-                    // FLUJO DEL COBRADOR
-                    await addDoc(collection(db, "pagos"), {
-                        prestamoId: prestamoId,
-                        cobradorId: auth.currentUser.uid, cobradorNombre: nombreCobrador,
-                        montoPagado: montoPagado, estado: "Pendiente de Aprobación", 
-                        fechaRegistro: fechaRegistroSegura // <-- FECHA MANUAL
-                    });
-                    
-                    cerrarModalPago();
-                    
-                    if (confirm("¡Pago registrado para revisión! ¿Deseas IMPRIMIR el Ticket?")) {
-                        imprimirTicket(fechaBonita, nombreCliente, montoPagado, nombreCobrador, tieneMora);
-                    }
-                    if (confirm("¿Deseas enviar la notificación de pago por WHATSAPP al cliente?")) {
-                        enviarWhatsApp(prestamoId, montoPagado, nombreCliente, nombreCobrador, tieneMora);
                     }
                 }
-            } catch (error) { alert("Error al procesar pago: " + error.message); } 
-            finally { btnSubmit.disabled = false; btnSubmit.innerText = "Procesar Pago"; }
-        });
+
+                // LÓGICA DE ABONO A CAPITAL (Si es préstamo abierto y sobra dinero)
+                let nuevoCapital = datos.montoCapital;
+                if (datos.tipo === "Abierto" && sobrante > 0) {
+                    nuevoCapital -= sobrante;
+                    if (nuevoCapital < 0) nuevoCapital = 0;
+                }
+
+                await updateDoc(pref, {
+                    balancePendiente: nBalance,
+                    montoCapital: nuevoCapital, // <--- ABONO A CAPITAL
+                    planDePagos: planActualizado,
+                    estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
+                });
+            }
+
+            cerrarModalPago();
+            
+            if (confirm("¡Cobro aprobado! ¿Deseas IMPRIMIR el recibo?")) {
+                imprimirTicket(fechaBonita, nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
+            }
+            if (confirm("¿Deseas enviarlo por WHATSAPP?")) {
+                enviarWhatsApp(prestamoId, montoPagado, nombreCliente, "Admin: " + nombreCobrador, tieneMora);
+            }
+
+        } else {
+            // --- FLUJO DEL COBRADOR (ESPERA APROBACIÓN) ---
+            await addDoc(collection(db, "pagos"), {
+                prestamoId: prestamoId,
+                clienteNombre: nombreCliente, // <--- Para que el Admin lo vea en la lista
+                cobradorId: auth.currentUser.uid, 
+                cobradorNombre: nombreCobrador,
+                montoPagado: montoPagado, 
+                estado: "Pendiente de Aprobación", 
+                fechaRegistro: fechaRegistroSegura
+            });
+            
+            cerrarModalPago();
+            
+            if (confirm("¡Pago enviado a revisión! ¿Deseas imprimir un ticket provisional?")) {
+                imprimirTicket(fechaBonita, nombreCliente, montoPagado, nombreCobrador, tieneMora);
+            }
+        }
+    } catch (error) { 
+        alert("Error al procesar pago: " + error.message); 
+    } finally { 
+        btnSubmit.disabled = false; 
+        btnSubmit.innerText = "Procesar Pago"; 
+    }
+});
 
         // D. Administrador: Aprobar / Rechazar Operaciones
         window.aprobarPrestamo = async (id) => { 
@@ -1526,14 +1571,26 @@
             if(confirm("¿Rechazar este pago?")) await updateDoc(doc(db, "pagos", id), { estado: "Rechazado" }); 
         };
 
-        // ¡MAGIA AVANZADA! Aprobar pago, tachar cuota y descontar sobrante al final
+        // ¡MAGIA AVANZADA! Aprobar pago desde el Dashboard (Con sincronización de fechas reales y redondeo)
         window.aprobarPago = async (idPago, prestamoId, montoPagado) => {
-            if (!confirm(`¿Aprobar pago de $${montoPagado}? El sistema calculará la amortización automáticamente.`)) return;
+            if (!confirm(`¿Aprobar pago de $${montoPagado}? El sistema amortizará la cuota con la fecha real del cobro.`)) return;
+            
             try {
-                // 1. Aprobamos el recibo de pago
-                await updateDoc(doc(db, "pagos", idPago), { estado: "Aprobado" });
+                // 1. OBTENER EL RECIBO DE PAGO (Para extraer la fecha en la que el cobrador recibió el dinero)
+                const pagoRef = doc(db, "pagos", idPago);
+                const pagoDoc = await getDoc(pagoRef);
                 
-                // 2. Traemos el préstamo para analizar las cuotas
+                if (!pagoDoc.exists()) {
+                    alert("❌ Error: No se encontró el recibo en la base de datos.");
+                    return;
+                }
+                
+                // Extraemos la fecha exacta del recibo (Ej: 2025-11-27) y le damos formato bonito
+                const datosPago = pagoDoc.data();
+                const fechaObj = new Date(datosPago.fechaRegistro);
+                const fechaRealDelCobro = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
+
+                // 2. OBTENER EL PRÉSTAMO Y AMORTIZAR
                 const pref = doc(db, "prestamos", prestamoId);
                 const pDoc = await getDoc(pref);
                 
@@ -1543,18 +1600,20 @@
                     if (nBalance < 0) nBalance = 0;
 
                     let planActualizado = [...datos.planDePagos];
-                    let sobrante = montoPagado; // El dinero que tenemos en la mano para repartir
+                    let sobrante = montoPagado;
 
-                    // PASO A: Cubrir la cuota ACTUAL (la primera que encuentre pendiente)
+                    // PASO A: Cubrir la cuota ACTUAL pendiente
                     for (let i = 0; i < planActualizado.length; i++) {
                         if (planActualizado[i].estado === "Pendiente") {
-                            if (sobrante >= planActualizado[i].monto) {
-                                // Pagó la cuota completa
+                            // Usamos Math.round para evitar fallos de centavos en Javascript
+                            let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
+                            let sobranteRedondeado = Math.round(sobrante * 100) / 100;
+
+                            if (sobranteRedondeado >= montoCuota) {
                                 sobrante -= planActualizado[i].monto;
                                 planActualizado[i].estado = "Pagado";
-                                break; 
+                                planActualizado[i].fechaPagoReal = fechaRealDelCobro; // <-- ¡La fecha del Cobrador!
                             } else {
-                                // Pago incompleto (Solo hizo un abono a esta cuota)
                                 planActualizado[i].monto -= sobrante;
                                 sobrante = 0;
                                 break;
@@ -1562,17 +1621,23 @@
                         }
                     }
 
-                    // PASO B: Si pagó de más, el sobrante ataca a la ÚLTIMA cuota (de atrás hacia adelante)
-                    if (sobrante > 0) {
+                    // PASO B: Abono a Capital / Descuento extra
+                    let nuevoCapital = datos.montoCapital;
+                    if (datos.tipo === "Abierto" && sobrante > 0) {
+                        nuevoCapital -= sobrante;
+                        if (nuevoCapital < 0) nuevoCapital = 0;
+                    } else if (datos.tipo === "Cuotas" && sobrante > 0) {
                         for (let i = planActualizado.length - 1; i >= 0; i--) {
                             if (planActualizado[i].estado === "Pendiente") {
-                                if (sobrante >= planActualizado[i].monto) {
-                                    // El sobrante fue tan grande que eliminó la última cuota entera
+                                let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
+                                let sobranteRedondeado = Math.round(sobrante * 100) / 100;
+
+                                if (sobranteRedondeado >= montoCuota) {
                                     sobrante -= planActualizado[i].monto;
                                     planActualizado[i].monto = 0;
                                     planActualizado[i].estado = "Pagado"; 
+                                    planActualizado[i].fechaPagoReal = fechaRealDelCobro;
                                 } else {
-                                    // Descuento parcial a la última cuota
                                     planActualizado[i].monto -= sobrante;
                                     sobrante = 0;
                                     break;
@@ -1581,16 +1646,22 @@
                         }
                     }
 
-                    // 3. Guardamos los nuevos cálculos en Firebase
+                    // 3. ACTUALIZAR PRÉSTAMO EN FIREBASE
                     await updateDoc(pref, {
                         balancePendiente: nBalance,
-                        planDePagos: planActualizado, // Guardamos el array con los nuevos descuentos
+                        montoCapital: nuevoCapital,
+                        planDePagos: planActualizado,
                         estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
                     });
                     
-                    alert("Pago procesado con éxito. El plan de pagos se ajustó automáticamente.");
+                    // 4. FINALMENTE, MARCAR EL RECIBO COMO APROBADO
+                    await updateDoc(pagoRef, { estado: "Aprobado" });
+                    
+                    alert("✅ Pago aprobado exitosamente. La cuota se registró con la fecha real del cobrador.");
                 }
-            } catch (error) { alert("Error: " + error.message); }
+            } catch (error) { 
+                alert("Error crítico: " + error.message); 
+            }
         };
 
         // ============================================================================
@@ -1712,10 +1783,8 @@
         async function verificarYAplicarMoras() {
             const ajustesSnap = await getDoc(doc(db, "ajustes", "mora"));
             if (!ajustesSnap.exists()) return;
-            
             const { porcentaje, diasGracia } = ajustesSnap.data();
             const hoy = new Date();
-            const hoyStr = hoy.toISOString().split('T')[0];
 
             const q = query(collection(db, "prestamos"), where("estado", "==", "Activo"));
             const querySnapshot = await getDocs(q);
@@ -1725,65 +1794,73 @@
                 const prestamoRef = doc(db, "prestamos", documento.id);
                 let planActualizado = [...p.planDePagos];
                 let huboCambios = false;
-                let montoASumarAlBalance = 0;
+                let acumuladoBalance = 0;
 
-                // --- PARTE A: LÓGICA DE MORAS (Para todos los préstamos) ---
+                // --- PARTE A: MORAS ---
                 planActualizado.forEach((cuota) => {
                     const fechaCuota = new Date(cuota.fecha + 'T12:00:00');
                     const diffDias = Math.floor((hoy - fechaCuota) / (1000 * 60 * 60 * 24));
-
                     if (cuota.estado === "Pendiente" && diffDias > diasGracia && !cuota.moraAplicada) {
                         const recargo = cuota.monto * (porcentaje / 100);
                         cuota.monto += recargo;
                         cuota.moraAplicada = true;
                         cuota.valorMora = recargo; 
-                        montoASumarAlBalance += recargo;
+                        acumuladoBalance += recargo;
                         huboCambios = true;
                     }
                 });
 
-                // --- PARTE B: GENERACIÓN DE NUEVO INTERÉS (Solo para Préstamos Abiertos/Rédito) ---
+                // --- PARTE B: GENERACIÓN MÚLTIPLE (INTERÉS COMPUESTO EN RÉDITO) ---
                 if (p.tipo === "Abierto") {
-                    // Buscamos la última cuota generada en el plan
-                    const ultimaCuota = planActualizado[planActualizado.length - 1];
-                    const fechaUltima = new Date(ultimaCuota.fecha + 'T12:00:00');
+                    let ultimaCuota = planActualizado[planActualizado.length - 1];
+                    let fechaSiguiente = new Date(ultimaCuota.fecha + 'T12:00:00');
                     
-                    // Si ya pasó la fecha de la última cuota, generamos la siguiente
-                    if (hoy >= fechaUltima) {
-                        let nuevaFecha = new Date(fechaUltima);
+                    // Función para sumar tiempo según frecuencia
+                    const sumarPeriodo = (fecha) => {
+                        let f = new Date(fecha);
+                        if (p.frecuencia === 'Diario') f.setDate(f.getDate() + 1);
+                        else if (p.frecuencia === 'Semanal') f.setDate(f.getDate() + 7);
+                        else if (p.frecuencia === 'Quincenal') f.setDate(f.getDate() + 15);
+                        else if (p.frecuencia === 'Mensual') f.setMonth(f.getMonth() + 1);
+                        return f;
+                    };
+
+                    fechaSiguiente = sumarPeriodo(fechaSiguiente);
+
+                    // Bucle para generar todas las cuotas faltantes hasta hoy
+                    while (hoy >= fechaSiguiente) {
+                        const nuevaFechaStr = fechaSiguiente.toISOString().split('T')[0];
                         
-                        // Calculamos la fecha según la frecuencia
-                        if (p.frecuencia === 'Diario') nuevaFecha.setDate(nuevaFecha.getDate() + 1);
-                        else if (p.frecuencia === 'Semanal') nuevaFecha.setDate(nuevaFecha.getDate() + 7);
-                        else if (p.frecuencia === 'Quincenal') nuevaFecha.setDate(nuevaFecha.getDate() + 15);
-                        else if (p.frecuencia === 'Mensual') nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
+                        // 🧠 LA MAGIA DEL INTERÉS COMPUESTO:
+                        // Calculamos la deuda total en este exacto momento.
+                        // p.balancePendiente trae la deuda hasta hoy, y acumuladoBalance trae lo que le hemos sumado en este mismo proceso.
+                        let deudaActual = p.balancePendiente + acumuladoBalance;
+                        
+                        // El nuevo interés se calcula sobre TODO lo adeudado, no sobre el monto original.
+                        const nuevoInteres = deudaActual * (p.interesPorcentaje / 100);
+                        
+                        planActualizado.push({
+                            cuota: planActualizado.length + 1,
+                            fecha: nuevaFechaStr,
+                            monto: nuevoInteres,
+                            estado: "Pendiente",
+                            esInteresAbierto: true
+                        });
 
-                        const nuevaFechaStr = nuevaFecha.toISOString().split('T')[0];
-
-                        // Evitamos duplicados: Solo agregamos si la fecha es distinta
-                        if (ultimaCuota.fecha !== nuevaFechaStr) {
-                            const nuevoInteres = p.montoCapital * (p.interesPorcentaje / 100);
-                            
-                            planActualizado.push({
-                                cuota: planActualizado.length + 1,
-                                fecha: nuevaFechaStr,
-                                monto: nuevoInteres,
-                                estado: "Pendiente",
-                                esInteresAbierto: true
-                            });
-
-                            montoASumarAlBalance += nuevoInteres;
-                            huboCambios = true;
-                        }
+                        acumuladoBalance += nuevoInteres;
+                        huboCambios = true;
+                        
+                        // Avanzamos a la siguiente fecha
+                        fechaSiguiente = sumarPeriodo(fechaSiguiente);
                     }
                 }
 
-                // Guardar cambios si hubo moras o nuevos intereses generados
+                // Guardar todos los cambios calculados en Firebase
                 if (huboCambios) {
                     await updateDoc(prestamoRef, {
                         planDePagos: planActualizado,
-                        balancePendiente: p.balancePendiente + montoASumarAlBalance,
-                        totalAPagar: (p.totalAPagar || p.montoCapital) + montoASumarAlBalance
+                        balancePendiente: p.balancePendiente + acumuladoBalance,
+                        totalAPagar: (p.totalAPagar || p.montoCapital) + acumuladoBalance
                     });
                 }
             });
@@ -1799,25 +1876,24 @@
         }
 
         // ============================================================================
-        // 11. VISUALIZADOR DE HISTORIAL DE PAGOS (IRROMPIBLE)
+        // 11. VISUALIZADOR DE HISTORIAL DE PAGOS (Con botón de Reimpresión)
         // ============================================================================
         window.abrirModalHistorial = async (prestamoId) => {
             const modal = document.getElementById('modal-historial');
             const tbody = document.getElementById('tabla-historial-cuerpo');
             const titulo = document.getElementById('titulo-historial');
 
-            // SEGURO: Verificamos si borraste el HTML por error
             if (!modal || !tbody || !titulo) {
-                alert("⚠️ Error: Falta el código HTML del modal-historial. Revisa el paso 1.");
+                alert("⚠️ Error: Falta el código HTML del modal-historial.");
                 return;
             }
 
             modal.classList.remove('hidden');
             titulo.innerText = `Cargando Historial...`;
-            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center">Cargando datos desde la base...</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center"><i data-lucide="loader-2" class="w-5 h-5 animate-spin mx-auto text-blue-500"></i></td></tr>`;
+            if(typeof lucide !== 'undefined') lucide.createIcons();
 
             try {
-                // Importante: usamos Firebase para traer el préstamo fresco
                 const docSnap = await getDoc(doc(db, "prestamos", prestamoId));
                 
                 if (docSnap.exists()) {
@@ -1831,20 +1907,36 @@
                     }
 
                     p.planDePagos.forEach(cuota => {
-                        const badge = cuota.estado === 'Pagado' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>' : '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                        let badge = '';
+                        let btnImprimir = '';
                         const nombreCuota = cuota.esInteresAbierto ? `Interés ${cuota.cuota}` : `Cuota ${cuota.cuota}`;
+                        const nombreLimpio = p.nombreCliente.replace(/'/g, "\\'");
+                        const fVencimiento = cuota.fecha;
+
+                        if (cuota.estado === 'Pagado') {
+                            badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>';
+                            // Extraemos la fecha de pago real (o ponemos N/A si fue un pago viejo antes de esta actualización)
+                            const fPagoRealImpresion = cuota.fechaPagoReal ? cuota.fechaPagoReal : 'N/A';
+                            
+                            // Pasamos fPagoRealImpresion a la función
+                            btnImprimir = `<button onclick="imprimirComprobanteCliente('${nombreLimpio}', ${cuota.cuota}, '${cuota.fecha}', '${fPagoRealImpresion}', ${cuota.monto})" class="ml-2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1 rounded-full inline-flex items-center justify-center" title="Reimprimir Recibo"><i data-lucide="printer" class="w-4 h-4"></i></button>`;
+                        } else {
+                            badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                        }
                         
+                        const fPagoReal = cuota.fechaPagoReal ? cuota.fechaPagoReal : '<span class="text-gray-300">---</span>';
+
                         tbody.innerHTML += `
-                            <tr class="hover:bg-gray-50">
+                            <tr class="hover:bg-gray-50 text-xs">
                                 <td class="p-3 font-medium text-gray-800">${nombreCuota}</td>
-                                <td class="p-3 text-gray-500">${cuota.fecha}</td>
+                                <td class="p-3 text-red-500">${fVencimiento}</td>
+                                <td class="p-3 text-green-600 font-bold">${fPagoReal}</td>
                                 <td class="p-3 font-semibold">$${cuota.monto.toFixed(2)}</td>
-                                <td class="p-3 text-center">${badge}</td>
+                                <td class="p-3 text-center flex items-center justify-center">${badge} ${btnImprimir}</td>
                             </tr>
-                        `;
+                    `;
                     });
                     
-                    // Volvemos a dibujar los iconos por si acaso
                     if(typeof lucide !== 'undefined') lucide.createIcons();
 
                 } else {
