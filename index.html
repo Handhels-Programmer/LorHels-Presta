@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="do">
 <head>
@@ -86,6 +87,17 @@
                     <span>Cerrar Sesión</span>
                 </button>
             </div>
+
+            <!-- Footer -->
+    <footer class="p-6 text-center text-slate-500 text-sm border-t border-slate-800 mt-auto">
+ 
+        <p>&copy; 2026
+            <a href="https://lorhels.web.app" target="\\\\\\\\\\\\\\\_blank" rel="noopener noreferrer" class="text-blue-400 hover:text-blue-300 transition-colors duration-200 font-medium">
+            LorHels Systems
+        </a> Todos los derechos reservados.</p>
+        <p style="margin-top: 10px; color: #4b5563;">Desarrollado con pasión para brindar las mejores soluciones.</p>
+    </footer>
+
         </aside>
 
         <main class="flex-1 overflow-y-auto h-full p-6 bg-gray-50 flex flex-col items-center justify-start" id="main-content">
@@ -93,7 +105,14 @@
             <div id="vista-dashboard" class="w-full max-w-5xl fade-in">
                 
                 <div id="dashboard-admin" class="seccion-oculta">
-                    <h2 class="text-2xl font-bold text-gray-800 mb-6">Resumen del Negocio</h2>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold text-gray-800">Resumen del Negocio</h2>
+                        <div class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
+                            <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
+                            <span class="text-sm font-medium text-gray-600">Mes:</span>
+                            <input type="month" id="filtro-mes-dashboard" class="text-sm border-none focus:ring-0 bg-transparent text-gray-800 font-semibold cursor-pointer outline-none">
+                        </div>
+                    </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-blue-100 border-l-4 border-l-blue-500">
@@ -215,13 +234,22 @@
                     
                     <form id="form-pago" class="space-y-4">
                         <input type="hidden" id="pago-prestamo-id">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Monto Cobrado ($)</label>
-                            <input type="number" id="pago-monto" step="0.01" min="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Fecha del Pago</label>
+                                <input type="date" id="pago-fecha" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 bg-gray-50" required>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Monto Cobrado ($)</label>
+                                <input type="number" id="pago-monto" step="0.01" min="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500" required>
+                            </div>
                         </div>
+                        
                         <div class="flex justify-end space-x-3 mt-6">
                             <button type="button" onclick="cerrarModalPago()" class="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg transition font-medium">Cancelar</button>
-                            <button type="submit" id="btn-guardar-pago" class="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition font-medium">Enviar a Aprobación</button>
+                            <button type="submit" id="btn-guardar-pago" class="px-4 py-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition font-medium">Procesar Pago</button>
                         </div>
                     </form>
                 </div>
@@ -388,16 +416,24 @@
                             </div>
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Préstamo</label>
+                                    <select id="prestamo-tipo" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-blue-50 font-semibold" required>
+                                        <option value="Cuotas">Amortizado (Cuotas Fijas)</option>
+                                        <option value="Abierto">Abierto (Rédito / Solo Interés)</option>
+                                    </select>
+                                </div>
+                                
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Monto del Préstamo ($)</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Monto del Capital ($)</label>
                                     <input type="number" id="prestamo-monto" min="1" step="0.01" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Interés Total (%)</label>
-                                    <input type="number" id="prestamo-interes" min="0" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej. 15 o 20" required>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Interés por Periodo (%)</label>
+                                    <input type="number" id="prestamo-interes" min="0" step="0.1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Ej. 10" required>
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia de Pago</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Frecuencia de Cobro</label>
                                     <select id="prestamo-frecuencia" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white" required>
                                         <option value="Diario">Diario</option>
                                         <option value="Semanal">Semanal</option>
@@ -405,12 +441,14 @@
                                         <option value="Mensual">Mensual</option>
                                     </select>
                                 </div>
-                                <div>
+                                
+                                <div id="contenedor-cuotas">
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Cantidad de Cuotas</label>
-                                    <input type="number" id="prestamo-cuotas" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
+                                    <input type="number" id="prestamo-cuotas" min="1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
                                 </div>
+                                
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Primer Pago</label>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Fecha de Inicio / Primer Pago</label>
                                     <input type="date" id="prestamo-fecha-inicio" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500" required>
                                 </div>
                             </div>
@@ -486,6 +524,7 @@
                         </button>
                     </form>
                 </div>
+                
 
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
                     <h3 class="text-lg font-semibold mb-4 border-b pb-2 flex items-center space-x-2">
@@ -509,9 +548,38 @@
                         </div>
                     </form>
                 </div>
-
             </div>
 
+            <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-2">
+                            <i data-lucide="history" class="w-5 h-5 text-blue-600"></i>
+                            <span id="titulo-historial">Historial de Pagos</span>
+                        </h3>
+                        <button onclick="cerrarModalHistorial()" class="text-gray-500 hover:text-red-500 transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                    </div>
+                    
+                    <div class="overflow-y-auto flex-1">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 text-gray-700 text-sm uppercase tracking-wider">
+                                    <th class="p-3 border-b font-medium">Detalle</th>
+                                    <th class="p-3 border-b font-medium">Vencimiento</th>
+                                    <th class="p-3 border-b font-medium">Monto</th>
+                                    <th class="p-3 border-b font-medium text-center">Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabla-historial-cuerpo" class="text-sm text-gray-600 divide-y divide-gray-100">
+                                </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-4 flex justify-end">
+                        <button onclick="cerrarModalHistorial()" class="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition font-medium">Cerrar</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
@@ -548,6 +616,8 @@
                     </form>
                 </div>
     </div>
+
+    
 
     <script type="module">
         // ============================================================================
@@ -776,58 +846,9 @@
                         snap.forEach((docSnap) => {
                             const p = docSnap.data();
                             
-                            // 1. Buscamos la cuota exacta que le toca pagar hoy
-                            let proximaCuotaMonto = p.valorCuota; // Por defecto
-                            let tieneMora = false;
-                            
-                            if (p.planDePagos) {
-                                const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
-                                if (cuotaPendiente) {
-                                    proximaCuotaMonto = cuotaPendiente.monto; // Este monto ya tiene la mora sumada si aplica
-                                    tieneMora = cuotaPendiente.moraAplicada ? true : false;
-                                }
-                            }
-
-                            const badge = p.estado === 'Activo' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>' : `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">${p.estado}</span>`;
-                            
-                            // 2. Pasamos el monto exacto y si tiene mora al botón
-                            const boton = p.estado === 'Activo' ? `<button onclick="abrirModalPago('${docSnap.id}', '${p.nombreCliente}', ${proximaCuotaMonto}, ${tieneMora})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium">Cobrar</button>` : '-';
-                            
-                            tDashCob.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3">$${p.totalAPagar.toFixed(2)}</td><td class="p-3 text-blue-700 font-bold">$${p.balancePendiente.toFixed(2)}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center">${boton}</td></tr>`;
-                        });
-                        lucide.createIcons();
-                    }
-                });
-            }
-            
-            // D. VISTA DEL ADMINISTRADOR (Control Total y Estadísticas)
-            else if (rol === 'admin') {
-                
-                // 1. Estadísticas de Pagos (Total Cobrado) y Tabla de Pendientes
-                // Quitamos el filtro 'where' para traer TODOS los pagos y poder sumar los aprobados
-                onSnapshot(collection(db, "pagos"), (snap) => {
-                    const tPagos = document.getElementById('tabla-pagos-admin');
-                    if (tPagos) tPagos.innerHTML = '';
-                    
-                    let totalCobrado = 0;
-                    let hayPendientes = false;
-
-                    // Lista Completa de Préstamos (Con botón de Cobrar para el Admin)
-                onSnapshot(collection(db, "prestamos"), (snap) => {
-                    const tPres = document.getElementById('tabla-prestamos');
-                    if(tPres) {
-                        tPres.innerHTML = '';
-                        let totalPrestado = 0;
-
-                        snap.forEach((d) => {
-                            const p = d.data();
-                            if (p.estado === 'Activo' || p.estado === 'Pagado Completamente') {
-                                totalPrestado += p.montoCapital;
-                            }
-
-                            // Calcular la próxima cuota y mora por si el Admin quiere cobrar
                             let proximaCuotaMonto = p.valorCuota;
                             let tieneMora = false;
+                            
                             if (p.planDePagos) {
                                 const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
                                 if (cuotaPendiente) {
@@ -836,48 +857,87 @@
                                 }
                             }
 
-                            let badge = '', boton = '-';
-                            if (p.estado === 'Activo') {
-                                badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>';
-                                // EL ADMIN AHORA TIENE BOTÓN DE COBRAR AQUÍ
-                                boton = `<button onclick="abrirModalPago('${d.id}', '${p.nombreCliente}', ${proximaCuotaMonto}, ${tieneMora})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium mr-2"><i data-lucide="plus-circle" class="w-3 h-3 inline mr-1"></i>Cobrar</button>`;
-                            } else if (p.estado === 'Rechazado') {
-                                badge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Rechazado</span>';
-                                boton = '<span class="text-xs text-gray-400">Rechazado</span>';
-                            } else if (p.estado === 'Pagado Completamente') {
-                                badge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Saldado</span>';
-                                boton = '<span class="text-xs text-gray-400">Completado</span>';
-                            } else {
-                                badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
-                                boton = `
-                                    <div class="flex justify-center space-x-2 mr-2">
-                                        <button onclick="aprobarPrestamo('${d.id}')" class="bg-green-500 text-white p-1 rounded hover:bg-green-600" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button>
-                                        <button onclick="rechazarPrestamo('${d.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button>
-                                    </div>`;
-                            }
+                            const badge = p.estado === 'Activo' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>' : `<span class="px-2 py-1 bg-gray-100 text-gray-700 rounded-full text-xs">${p.estado}</span>`;
                             
-                            const btnEliminarPrestamo = `<button onclick="eliminarPrestamo('${d.id}')" class="text-red-400 hover:text-red-600 ml-2" title="Eliminar Préstamo"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                            // Botones corregidos para que no rompan con nombres extraños. Pasamos solo el ID al historial.
+                            const nombreLimpio = p.nombreCliente.replace(/'/g, "\\'");
+                            const boton = p.estado === 'Activo' ? `<button onclick="abrirModalPago('${docSnap.id}', '${nombreLimpio}', ${proximaCuotaMonto}, ${tieneMora})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium mr-2">Cobrar</button> <button onclick="abrirModalHistorial('${docSnap.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-xs font-medium"><i data-lucide="history" class="w-3 h-3 inline mr-1"></i>Ver</button>` : `<button onclick="abrirModalHistorial('${docSnap.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-xs font-medium"><i data-lucide="history" class="w-3 h-3 inline mr-1"></i>Ver</button>`;
                             
-                            tPres.innerHTML += `<tr><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3 font-medium text-blue-700">$${p.totalAPagar.toFixed(2)}</td><td class="p-3">${p.cantidadCuotas} cuotas</td><td class="p-3 text-xs text-gray-500">${p.creadoPorNombre}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center flex items-center justify-center">${boton} ${btnEliminarPrestamo}</td></tr>`;
+                            tDashCob.innerHTML += `<tr class="hover:bg-gray-50"><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3">$${p.totalAPagar.toFixed(2)}</td><td class="p-3 text-blue-700 font-bold">$${p.balancePendiente.toFixed(2)}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center">${boton}</td></tr>`;
                         });
-                        
-                        const statPrestado = document.getElementById('stat-prestado');
-                        if (statPrestado) statPrestado.innerText = `$${totalPrestado.toFixed(2)}`;
                         lucide.createIcons();
                     }
                 });
-                    
-                    // Actualizamos la tarjeta de Total Cobrado
-                    const statCobrado = document.getElementById('stat-cobrado');
-                    if (statCobrado) statCobrado.innerText = `$${totalCobrado.toFixed(2)}`;
+            }
+            
+            // D. VISTA DEL ADMINISTRADOR (Control Total, Estadísticas y Filtros)
+            else if (rol === 'admin') {
+                
+                // 1. LÓGICA DE PAGOS Y FILTRO POR MES (Corregido y separado)
+                let pagosTotalesAdmin = [];
+                const mesInput = document.getElementById('filtro-mes-dashboard');
+                
+                // Poner el mes actual por defecto al cargar
+                if (mesInput && !mesInput.value) {
+                    const hoy = new Date();
+                    mesInput.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
+                }
 
-                    if (!hayPendientes && tPagos) {
-                        tPagos.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500"><i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-green-400"></i>No hay pagos pendientes de aprobación.</td></tr>`;
-                    }
+                // Función que redibuja los pagos cuando cambias el mes
+                const renderizarPagosAdmin = () => {
+                    const tPagos = document.getElementById('tabla-pagos-admin');
+                    const statCobrado = document.getElementById('stat-cobrado');
+                    if (tPagos) tPagos.innerHTML = '';
+                    
+                    let totalCobrado = 0;
+                    let hayPendientes = false;
+                    const mesSeleccionado = mesInput ? mesInput.value : ''; // Formato: "2024-05"
+
+                    pagosTotalesAdmin.forEach(p => {
+                        // Extraemos "AAAA-MM" de la fecha del pago
+                        const mesDelPago = p.fechaRegistro ? p.fechaRegistro.substring(0, 7) : ''; 
+                        const cumpleFiltroMes = !mesSeleccionado || mesSeleccionado === mesDelPago;
+
+                        // Sumar ganancias SI ES APROBADO Y ES DEL MES SELECCIONADO
+                        if (p.estado === "Aprobado") {
+                            if (cumpleFiltroMes) totalCobrado += p.montoPagado;
+                        } 
+                        // Dibujar en tabla SI ES PENDIENTE (Los mostramos todos para que no se te olvide aprobarlos)
+                        else if (p.estado === "Pendiente de Aprobación") {
+                            hayPendientes = true;
+                            if (tPagos) {
+                                const fechaBonita = new Date(p.fechaRegistro).toLocaleDateString();
+                                tPagos.innerHTML += `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3">${fechaBonita}</td>
+                                        <td class="p-3">${p.cobradorNombre}</td>
+                                        <td class="p-3 text-xs text-gray-400" title="${p.prestamoId}">${p.prestamoId.substring(0,6)}...</td>
+                                        <td class="p-3 text-green-600 font-bold">$${p.montoPagado.toFixed(2)}</td>
+                                        <td class="p-3 flex justify-center space-x-2">
+                                            <button onclick="aprobarPago('${p.id}', '${p.prestamoId}', ${p.montoPagado})" class="bg-green-500 text-white p-1 rounded hover:bg-green-600" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button>
+                                            <button onclick="rechazarPago('${p.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button>
+                                        </td>
+                                    </tr>`;
+                            }
+                        }
+                    });
+
+                    if (statCobrado) statCobrado.innerText = `$${totalCobrado.toFixed(2)}`;
+                    if (!hayPendientes && tPagos) tPagos.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-gray-500"><i data-lucide="check-circle" class="w-8 h-8 mx-auto mb-2 text-green-400"></i>No hay pagos pendientes de aprobación.</td></tr>`;
                     lucide.createIcons();
+                };
+
+                // Escuchamos cambios en el filtro de mes
+                if (mesInput) mesInput.addEventListener('change', renderizarPagosAdmin);
+
+                // Escuchamos la base de datos de Pagos
+                onSnapshot(collection(db, "pagos"), (snap) => {
+                    pagosTotalesAdmin = [];
+                    snap.forEach(d => pagosTotalesAdmin.push({id: d.id, ...d.data()}));
+                    renderizarPagosAdmin();
                 });
                 
-                // 2. Estadísticas de Préstamos (Capital Total Prestado) y Lista
+                // 2. LÓGICA DE PRÉSTAMOS (Totalmente separada)
                 onSnapshot(collection(db, "prestamos"), (snap) => {
                     const tPres = document.getElementById('tabla-prestamos');
                     if(tPres) tPres.innerHTML = '';
@@ -887,41 +947,43 @@
                     snap.forEach((d) => {
                         const p = d.data();
                         
-                        // Sumamos al total solo si el préstamo está Activo o Pagado (el dinero salió de caja)
                         if (p.estado === 'Activo' || p.estado === 'Pagado Completamente') {
                             totalPrestado += p.montoCapital;
                         }
 
+                        let proximaCuotaMonto = p.valorCuota;
+                        let tieneMora = false;
+                        if (p.planDePagos) {
+                            const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
+                            if (cuotaPendiente) { proximaCuotaMonto = cuotaPendiente.monto; tieneMora = !!cuotaPendiente.moraAplicada; }
+                        }
+
                         let badge = '', boton = '-';
+                        const nombreLimpio = p.nombreCliente.replace(/'/g, "\\'");
+
                         if (p.estado === 'Activo') {
                             badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Activo</span>';
-                            boton = '<span class="text-xs text-gray-400">Aprobado</span>';
+                            boton = `<button onclick="abrirModalPago('${d.id}', '${nombreLimpio}', ${proximaCuotaMonto}, ${tieneMora})" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 text-xs font-medium mr-1"><i data-lucide="plus-circle" class="w-3 h-3 inline mr-1"></i>Cobrar</button> <button onclick="abrirModalHistorial('${d.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-xs font-medium"><i data-lucide="history" class="w-3 h-3 inline"></i></button>`;
                         } else if (p.estado === 'Rechazado') {
                             badge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded-full text-xs">Rechazado</span>';
                             boton = '<span class="text-xs text-gray-400">Rechazado</span>';
                         } else if (p.estado === 'Pagado Completamente') {
                             badge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">Saldado</span>';
-                            boton = '<span class="text-xs text-gray-400">Completado</span>';
+                            boton = `<button onclick="abrirModalHistorial('${d.id}')" class="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-xs font-medium"><i data-lucide="history" class="w-3 h-3 inline mr-1"></i>Historial</button>`;
                         } else {
                             badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
                             boton = `
-                                <div class="flex justify-center space-x-2">
+                                <div class="flex justify-center space-x-2 mr-2">
                                     <button onclick="aprobarPrestamo('${d.id}')" class="bg-green-500 text-white p-1 rounded hover:bg-green-600" title="Aprobar"><i data-lucide="check" class="w-4 h-4"></i></button>
                                     <button onclick="rechazarPrestamo('${d.id}')" class="bg-red-500 text-white p-1 rounded hover:bg-red-600" title="Rechazar"><i data-lucide="x" class="w-4 h-4"></i></button>
                                 </div>`;
                         }
                         
-                        if(tPres) {
-                            // Agregamos el icono de basura rojo independientemente del estado del préstamo
-                        const btnEliminarPrestamo = `<button onclick="eliminarPrestamo('${d.id}')" class="text-red-400 hover:text-red-600 ml-3" title="Eliminar Préstamo (Solo Accidentes)"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+                        const btnEliminarPrestamo = `<button onclick="eliminarPrestamo('${d.id}')" class="text-red-400 hover:text-red-600 ml-2" title="Eliminar Préstamo"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
                         
-                        if(tPres) {
-                            tPres.innerHTML += `<tr><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3 font-medium text-blue-700">$${p.totalAPagar.toFixed(2)}</td><td class="p-3">${p.cantidadCuotas} cuotas</td><td class="p-3 text-xs text-gray-500">${p.creadoPorNombre}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center flex items-center justify-center">${boton} ${btnEliminarPrestamo}</td></tr>`;
-                        }
-                        }
+                        if(tPres) tPres.innerHTML += `<tr><td class="p-3 font-semibold">${p.nombreCliente}</td><td class="p-3 font-medium text-blue-700">$${p.totalAPagar.toFixed(2)}</td><td class="p-3">${p.cantidadCuotas} cuotas</td><td class="p-3 text-xs text-gray-500">${p.creadoPorNombre}</td><td class="p-3 text-center">${badge}</td><td class="p-3 text-center flex items-center justify-center">${boton} ${btnEliminarPrestamo}</td></tr>`;
                     });
                     
-                    // Actualizamos la tarjeta de Total Prestado
                     const statPrestado = document.getElementById('stat-prestado');
                     if (statPrestado) statPrestado.innerText = `$${totalPrestado.toFixed(2)}`;
                     lucide.createIcons();
@@ -933,7 +995,6 @@
                     snap.forEach((docSnap) => {
                         if (docSnap.data().estado === 'Activo') clientesActivos++;
                     });
-                    // Actualizamos la tarjeta de Clientes
                     const statClientes = document.getElementById('stat-clientes');
                     if (statClientes) statClientes.innerText = clientesActivos;
                 });
@@ -951,6 +1012,7 @@
                 });
             }
         }
+    
 
         // ============================================================================
         // 5. REGISTRO DE CUENTAS (CLIENTES Y COBRADORES)
@@ -1021,25 +1083,47 @@
         // 6. LÓGICA DE PRÉSTAMOS
         // ============================================================================
         
-        // A. Delegación de eventos para la Calculadora Mágica
+        // A. Delegación de eventos para la Calculadora Mágica e Interfaz
         function calcularResumen() {
+            const tipo = document.getElementById('prestamo-tipo')?.value || 'Cuotas';
+            const contCuotas = document.getElementById('contenedor-cuotas');
+            const inCuotas = document.getElementById('prestamo-cuotas');
+
+            // Mostrar u Ocultar el campo de cuotas según el tipo
+            if (tipo === 'Abierto') {
+                if(contCuotas) contCuotas.classList.add('hidden');
+                if(inCuotas) inCuotas.removeAttribute('required');
+            } else {
+                if(contCuotas) contCuotas.classList.remove('hidden');
+                if(inCuotas) inCuotas.setAttribute('required', 'true');
+            }
+
             const m = parseFloat(document.getElementById('prestamo-monto')?.value) || 0;
             const i = parseFloat(document.getElementById('prestamo-interes')?.value) || 0;
-            const c = parseInt(document.getElementById('prestamo-cuotas')?.value) || 1;
-            const interesGen = m * (i / 100);
-            const total = m + interesGen;
+            const c = parseInt(inCuotas?.value) || 1;
             
             const rCap = document.getElementById('resumen-capital');
             if (rCap) {
-                rCap.innerText = `$${m.toFixed(2)}`;
-                document.getElementById('resumen-interes').innerText = `+$${interesGen.toFixed(2)}`;
-                document.getElementById('resumen-total').innerText = `$${total.toFixed(2)}`;
-                document.getElementById('resumen-cuota').innerText = `$${(total / c).toFixed(2)}`;
+                if (tipo === 'Cuotas') {
+                    const interesGen = m * (i / 100);
+                    const total = m + interesGen;
+                    rCap.innerText = `$${m.toFixed(2)}`;
+                    document.getElementById('resumen-interes').innerText = `+$${interesGen.toFixed(2)}`;
+                    document.getElementById('resumen-total').innerText = `$${total.toFixed(2)}`;
+                    document.getElementById('resumen-cuota').innerText = `$${(total / c).toFixed(2)}`;
+                } else {
+                    // Matemáticas para Préstamo Abierto
+                    const interesPeriodico = m * (i / 100);
+                    rCap.innerText = `$${m.toFixed(2)}`;
+                    document.getElementById('resumen-interes').innerText = `+$${interesPeriodico.toFixed(2)} por periodo`;
+                    document.getElementById('resumen-total').innerText = `Dinámico`;
+                    document.getElementById('resumen-cuota').innerText = `$${interesPeriodico.toFixed(2)} (Solo Interés)`;
+                }
             }
         }
 
         document.addEventListener('input', (e) => {
-            if (['prestamo-monto', 'prestamo-interes', 'prestamo-cuotas'].includes(e.target.id)) {
+            if (['prestamo-monto', 'prestamo-interes', 'prestamo-cuotas', 'prestamo-tipo'].includes(e.target.id)) {
                 calcularResumen();
             }
         });
@@ -1084,21 +1168,32 @@
                     return;
                 }
 
-                // Cálculo Final
+                // Cálculo Final según el Tipo de Préstamo
+                const tipo = document.getElementById('prestamo-tipo').value;
                 const m = parseFloat(document.getElementById('prestamo-monto').value);
                 const i = parseFloat(document.getElementById('prestamo-interes').value);
-                const c = parseInt(document.getElementById('prestamo-cuotas').value);
-                const intGen = m * (i/100); const total = m + intGen; const vCuota = total / c;
-                
-                const fIni = document.getElementById('prestamo-fecha-inicio').value;
                 const frec = document.getElementById('prestamo-frecuencia').value;
-                const plan = generarFechas(fIni, frec, c, vCuota);
+                const fIni = document.getElementById('prestamo-fecha-inicio').value;
                 
+                let total = 0, vCuota = 0, intGen = 0, c = 0, plan = [];
                 const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
                 const estadoIni = rolActual === 'admin' ? "Activo" : "Pendiente de Aprobación";
 
+                if (tipo === 'Cuotas') {
+                    c = parseInt(document.getElementById('prestamo-cuotas').value);
+                    intGen = m * (i/100); total = m + intGen; vCuota = total / c;
+                    plan = generarFechas(fIni, frec, c, vCuota);
+                } else {
+                    // Para PRÉSTAMO ABIERTO:
+                    c = 999; // Representa indefinido
+                    vCuota = m * (i/100); // La cuota es solo el interés
+                    intGen = vCuota; // El primer interés generado
+                    total = m + vCuota; // Deuda inicial = Capital + 1er interés
+                    // Generamos solo la primera cuota (el sistema automático generará las demás)
+                    plan = [{ cuota: 1, fecha: fIni, monto: vCuota, estado: "Pendiente", esInteresAbierto: true }];
+                }
+
                 try {
-                    // Extraemos el ID del cobrador dueño de este cliente
                     const cobradorAsignado = sel.options[sel.selectedIndex].getAttribute('data-cobrador');
 
                     await addDoc(collection(db, "prestamos"), {
@@ -1106,10 +1201,12 @@
                         nombreCliente: sel.options[sel.selectedIndex].text,
                         creadoPorId: auth.currentUser.uid, 
                         creadoPorNombre: document.getElementById('nombre-usuario').innerText,
-                        cobradorId: cobradorAsignado, // <--- EL NUEVO ENLACE DE SEGURIDAD
+                        cobradorId: cobradorAsignado, 
+                        tipo: tipo, // Guardamos el tipo (Cuotas o Abierto)
                         montoCapital: m, interesPorcentaje: i, frecuencia: frec, cantidadCuotas: c, fechaPrimerPago: fIni,
                         interesTotalGenerado: intGen, totalAPagar: total, valorCuota: vCuota, balancePendiente: total,
-                        planDePagos: plan, estado: estadoIni, fechaRegistro: new Date()
+                        planDePagos: plan, estado: estadoIni, fechaRegistro: new Date().toISOString(),
+                        ultimaFechaGeneracion: new Date().toISOString() // Para saber cuándo calcular el próximo interés
                     });
                     
                     alert(estadoIni === "Activo" ? "¡Préstamo aprobado!" : "¡Préstamo enviado a aprobación!");
@@ -1124,7 +1221,7 @@
         // 7. SISTEMA DE PAGOS, TICKETS Y APROBACIONES
         // ============================================================================
         
-        // A. Manejo del Modal (Adaptable para Admin y Cobrador)
+        // A. Manejo del Modal (Adaptable para Admin y Cobrador con Fecha)
         window.abrirModalPago = (id, nombre, cuotaMonto, tieneMora) => {
             document.getElementById('modal-pago').classList.remove('hidden');
             document.getElementById('pago-prestamo-id').value = id;
@@ -1137,13 +1234,18 @@
             document.getElementById('modal-pago-cliente').innerHTML = htmlCliente;
             document.getElementById('pago-monto').value = cuotaMonto.toFixed(2);
 
+            // Magia: Obtener fecha de hoy en formato AAAA-MM-DD para el input de fecha
+            const hoy = new Date();
+            const offset = hoy.getTimezoneOffset() * 60000; // Ajuste de zona horaria
+            const fechaLocalStr = new Date(hoy.getTime() - offset).toISOString().split('T')[0];
+            document.getElementById('pago-fecha').value = fechaLocalStr;
+
             // Cambiar el texto del botón según quién esté cobrando
             const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
             document.getElementById('btn-guardar-pago').innerText = rolActual === 'admin' ? "Cobrar y Aprobar Directo" : "Enviar a Aprobación";
         };
         
         window.cerrarModalPago = () => { document.getElementById('modal-pago').classList.add('hidden'); };
-
         // B. Generador de Ticket (Ahora incluye nota de mora y escudo anti-bloqueo)
         window.imprimirTicket = (fecha, cliente, monto, cobrador, tieneMora) => {
             const ventanaTicket = window.open('', '_blank', 'width=350,height=500');
@@ -1296,7 +1398,7 @@
             }
         };
 
-        // C. Guardar Pago (Diferente si es Admin o Cobrador)
+        // C. Guardar Pago (Capturando la fecha manual)
         document.getElementById('form-pago')?.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btnSubmit = document.getElementById('btn-guardar-pago');
@@ -1305,6 +1407,14 @@
             const prestamoId = document.getElementById('pago-prestamo-id').value;
             const montoPagado = parseFloat(document.getElementById('pago-monto').value);
             
+            // CAPTURAR LA FECHA MANUAL ELEGIDA
+            const fechaInput = document.getElementById('pago-fecha').value;
+            // Aseguramos una hora media (12:00 PM) para evitar problemas de zona horaria al guardar en Firebase
+            const fechaRegistroSegura = new Date(fechaInput + 'T12:00:00').toISOString();
+            // Formato bonito para el ticket y WhatsApp (DD/MM/YYYY)
+            const [anio, mes, dia] = fechaInput.split('-');
+            const fechaBonita = `${dia}/${mes}/${anio}`;
+
             const divClienteHTML = document.getElementById('modal-pago-cliente').innerHTML;
             const tieneMora = divClienteHTML.includes('recargos por atraso');
             const nombreCliente = divClienteHTML.split('<br>')[0].replace('Cliente: ', '');
@@ -1314,17 +1424,17 @@
 
             try {
                 if (rolActual === 'admin') {
-                    // FLUJO DEL ADMINISTRADOR
+                    // 1. FLUJO DEL ADMINISTRADOR: El pago entra ya aprobado
                     await addDoc(collection(db, "pagos"), {
                         prestamoId: prestamoId,
                         cobradorId: auth.currentUser.uid, 
                         cobradorNombre: "Admin: " + nombreCobrador, 
                         montoPagado: montoPagado, 
-                        estado: "Aprobado", 
-                        fechaRegistro: new Date().toISOString()
+                        estado: "Aprobado",
+                        fechaRegistro: fechaRegistroSegura // <-- FECHA MANUAL
                     });
 
-                    // Amortizamos las cuotas instantáneamente
+                    // 2. Amortizamos las cuotas instantáneamente
                     const pref = doc(db, "prestamos", prestamoId);
                     const pDoc = await getDoc(pref);
                     
@@ -1375,9 +1485,9 @@
 
                     cerrarModalPago();
                     
-                    // PREGUNTAS POST-PAGO (IMPRIMIR Y/O WHATSAPP)
+                    // Pasamos "fechaBonita" en lugar de new Date().toLocaleDateString()
                     if (confirm("¡Cobro directo procesado con éxito! ¿Deseas IMPRIMIR el recibo en papel?")) {
-                        imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
+                        imprimirTicket(fechaBonita, nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
                     }
                     if (confirm("¿Deseas enviar el comprobante digital por WHATSAPP al cliente?")) {
                         enviarWhatsApp(prestamoId, montoPagado, nombreCliente, "Admin: " + nombreCobrador, tieneMora);
@@ -1389,14 +1499,13 @@
                         prestamoId: prestamoId,
                         cobradorId: auth.currentUser.uid, cobradorNombre: nombreCobrador,
                         montoPagado: montoPagado, estado: "Pendiente de Aprobación", 
-                        fechaRegistro: new Date().toISOString()
+                        fechaRegistro: fechaRegistroSegura // <-- FECHA MANUAL
                     });
                     
                     cerrarModalPago();
                     
-                    // PREGUNTAS POST-PAGO (IMPRIMIR Y/O WHATSAPP)
                     if (confirm("¡Pago registrado para revisión! ¿Deseas IMPRIMIR el Ticket?")) {
-                        imprimirTicket(new Date().toLocaleDateString(), nombreCliente, montoPagado, nombreCobrador, tieneMora);
+                        imprimirTicket(fechaBonita, nombreCliente, montoPagado, nombreCobrador, tieneMora);
                     }
                     if (confirm("¿Deseas enviar la notificación de pago por WHATSAPP al cliente?")) {
                         enviarWhatsApp(prestamoId, montoPagado, nombreCliente, nombreCobrador, tieneMora);
@@ -1601,14 +1710,13 @@
 
         // B. Función Maestra: Verificar y Aplicar Recargos
         async function verificarYAplicarMoras() {
-            // 1. Obtener los ajustes de mora
             const ajustesSnap = await getDoc(doc(db, "ajustes", "mora"));
-            if (!ajustesSnap.exists()) return; // Si no hay configuración, no hace nada
+            if (!ajustesSnap.exists()) return;
             
             const { porcentaje, diasGracia } = ajustesSnap.data();
             const hoy = new Date();
+            const hoyStr = hoy.toISOString().split('T')[0];
 
-            // 2. Traer préstamos activos
             const q = query(collection(db, "prestamos"), where("estado", "==", "Activo"));
             const querySnapshot = await getDocs(q);
 
@@ -1617,29 +1725,65 @@
                 const prestamoRef = doc(db, "prestamos", documento.id);
                 let planActualizado = [...p.planDePagos];
                 let huboCambios = false;
-                let recargoTotal = 0;
+                let montoASumarAlBalance = 0;
 
+                // --- PARTE A: LÓGICA DE MORAS (Para todos los préstamos) ---
                 planActualizado.forEach((cuota) => {
                     const fechaCuota = new Date(cuota.fecha + 'T12:00:00');
-                    // Calculamos la diferencia en días
-                    const diffTiempo = hoy - fechaCuota;
-                    const diffDias = Math.floor(diffTiempo / (1000 * 60 * 60 * 24));
+                    const diffDias = Math.floor((hoy - fechaCuota) / (1000 * 60 * 60 * 24));
 
-                    // Si el atraso es mayor a los días de gracia y no se ha aplicado mora antes
                     if (cuota.estado === "Pendiente" && diffDias > diasGracia && !cuota.moraAplicada) {
                         const recargo = cuota.monto * (porcentaje / 100);
                         cuota.monto += recargo;
-                        cuota.moraAplicada = true; // Marcamos para no cobrar doble
+                        cuota.moraAplicada = true;
                         cuota.valorMora = recargo; 
-                        recargoTotal += recargo;
+                        montoASumarAlBalance += recargo;
                         huboCambios = true;
                     }
                 });
 
+                // --- PARTE B: GENERACIÓN DE NUEVO INTERÉS (Solo para Préstamos Abiertos/Rédito) ---
+                if (p.tipo === "Abierto") {
+                    // Buscamos la última cuota generada en el plan
+                    const ultimaCuota = planActualizado[planActualizado.length - 1];
+                    const fechaUltima = new Date(ultimaCuota.fecha + 'T12:00:00');
+                    
+                    // Si ya pasó la fecha de la última cuota, generamos la siguiente
+                    if (hoy >= fechaUltima) {
+                        let nuevaFecha = new Date(fechaUltima);
+                        
+                        // Calculamos la fecha según la frecuencia
+                        if (p.frecuencia === 'Diario') nuevaFecha.setDate(nuevaFecha.getDate() + 1);
+                        else if (p.frecuencia === 'Semanal') nuevaFecha.setDate(nuevaFecha.getDate() + 7);
+                        else if (p.frecuencia === 'Quincenal') nuevaFecha.setDate(nuevaFecha.getDate() + 15);
+                        else if (p.frecuencia === 'Mensual') nuevaFecha.setMonth(nuevaFecha.getMonth() + 1);
+
+                        const nuevaFechaStr = nuevaFecha.toISOString().split('T')[0];
+
+                        // Evitamos duplicados: Solo agregamos si la fecha es distinta
+                        if (ultimaCuota.fecha !== nuevaFechaStr) {
+                            const nuevoInteres = p.montoCapital * (p.interesPorcentaje / 100);
+                            
+                            planActualizado.push({
+                                cuota: planActualizado.length + 1,
+                                fecha: nuevaFechaStr,
+                                monto: nuevoInteres,
+                                estado: "Pendiente",
+                                esInteresAbierto: true
+                            });
+
+                            montoASumarAlBalance += nuevoInteres;
+                            huboCambios = true;
+                        }
+                    }
+                }
+
+                // Guardar cambios si hubo moras o nuevos intereses generados
                 if (huboCambios) {
                     await updateDoc(prestamoRef, {
                         planDePagos: planActualizado,
-                        balancePendiente: p.balancePendiente + recargoTotal
+                        balancePendiente: p.balancePendiente + montoASumarAlBalance,
+                        totalAPagar: (p.totalAPagar || p.montoCapital) + montoASumarAlBalance
                     });
                 }
             });
@@ -1653,6 +1797,71 @@
                 document.getElementById('ajuste-mora-dias').value = snap.data().diasGracia;
             }
         }
+
+        // ============================================================================
+        // 11. VISUALIZADOR DE HISTORIAL DE PAGOS (IRROMPIBLE)
+        // ============================================================================
+        window.abrirModalHistorial = async (prestamoId) => {
+            const modal = document.getElementById('modal-historial');
+            const tbody = document.getElementById('tabla-historial-cuerpo');
+            const titulo = document.getElementById('titulo-historial');
+
+            // SEGURO: Verificamos si borraste el HTML por error
+            if (!modal || !tbody || !titulo) {
+                alert("⚠️ Error: Falta el código HTML del modal-historial. Revisa el paso 1.");
+                return;
+            }
+
+            modal.classList.remove('hidden');
+            titulo.innerText = `Cargando Historial...`;
+            tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center">Cargando datos desde la base...</td></tr>`;
+
+            try {
+                // Importante: usamos Firebase para traer el préstamo fresco
+                const docSnap = await getDoc(doc(db, "prestamos", prestamoId));
+                
+                if (docSnap.exists()) {
+                    const p = docSnap.data();
+                    titulo.innerText = `Historial de: ${p.nombreCliente}`;
+                    tbody.innerHTML = '';
+                    
+                    if (!p.planDePagos || p.planDePagos.length === 0) {
+                        tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No hay cuotas registradas.</td></tr>`;
+                        return;
+                    }
+
+                    p.planDePagos.forEach(cuota => {
+                        const badge = cuota.estado === 'Pagado' ? '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>' : '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
+                        const nombreCuota = cuota.esInteresAbierto ? `Interés ${cuota.cuota}` : `Cuota ${cuota.cuota}`;
+                        
+                        tbody.innerHTML += `
+                            <tr class="hover:bg-gray-50">
+                                <td class="p-3 font-medium text-gray-800">${nombreCuota}</td>
+                                <td class="p-3 text-gray-500">${cuota.fecha}</td>
+                                <td class="p-3 font-semibold">$${cuota.monto.toFixed(2)}</td>
+                                <td class="p-3 text-center">${badge}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    // Volvemos a dibujar los iconos por si acaso
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
+
+                } else {
+                    titulo.innerText = `Préstamo no encontrado`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">El préstamo ya no existe en la base de datos.</td></tr>`;
+                }
+            } catch (error) {
+                console.error(error);
+                tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-red-500">Error: ${error.message}</td></tr>`;
+            }
+        };
+
+        window.cerrarModalHistorial = () => {
+            const modal = document.getElementById('modal-historial');
+            if (modal) modal.classList.add('hidden');
+        };
+        
     </script>
 </body>
 </html>
