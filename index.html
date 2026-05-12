@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="do">
 <head>
@@ -64,7 +63,7 @@
 
     <div id="app-container" class="seccion-oculta">
         
-        <aside class="w-64 bg-gray-900 text-white flex flex-col h-full z-10 flex-shrink-0">
+        <aside id="sidebar" class="w-64 bg-gray-900 text-white flex flex-col h-full z-50 flex-shrink-0 fixed md:relative transition-transform duration-300 -translate-x-full md:translate-x-0">
             <div class="p-6 border-b border-gray-800">
                 <h1 class="text-xl font-bold text-blue-400 truncate">LorHels Presta</h1>
                 <div class="mt-4 flex items-center p-2 bg-gray-800 rounded-lg">
@@ -108,9 +107,17 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                         <h2 class="text-2xl font-bold text-gray-800">Resumen del Negocio</h2>
                         <div class="flex items-center space-x-2 bg-white p-2 rounded-lg border border-gray-200 shadow-sm">
-                            <i data-lucide="calendar" class="w-4 h-4 text-blue-600"></i>
-                            <span class="text-sm font-medium text-gray-600">Mes:</span>
-                            <input type="month" id="filtro-mes-dashboard" class="text-sm border-none focus:ring-0 bg-transparent text-gray-800 font-semibold cursor-pointer outline-none">
+                            <i data-lucide="filter" class="w-4 h-4 text-blue-600"></i>
+                            
+                            <select id="filtro-tipo-dashboard" class="text-sm border-none focus:ring-0 bg-transparent text-gray-800 font-semibold cursor-pointer outline-none">
+                                <option value="mensual">Por Mes</option>
+                                <option value="anual">Por Año</option>
+                                <option value="global">Histórico Global</option>
+                            </select>
+                            
+                            <input type="month" id="filtro-mes-dashboard" class="text-sm border-l border-gray-200 pl-2 ml-1 focus:ring-0 bg-transparent text-gray-800 font-semibold cursor-pointer outline-none">
+                            
+                            <input type="number" id="filtro-anio-dashboard" min="2020" max="2100" step="1" class="hidden text-sm border-l border-gray-200 pl-2 ml-1 focus:ring-0 bg-transparent text-gray-800 font-semibold cursor-pointer outline-none w-20" placeholder="AAAA">
                         </div>
                     </div>
                     
@@ -573,8 +580,8 @@
                 </div>
             </div>
 
-            <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div id="modal-historial" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-2 sm:p-4">
+                <div class="bg-white p-4 sm:p-6 rounded-xl shadow-lg w-full max-w-2xl max-h-[90vh] flex flex-col">
                     <div class="flex justify-between items-center mb-4 border-b pb-2">
                         <h3 class="text-lg font-bold text-gray-800 flex items-center space-x-2">
                             <i data-lucide="history" class="w-5 h-5 text-blue-600"></i>
@@ -640,6 +647,8 @@
                     </form>
                 </div>
     </div>
+
+    
 
     
 
@@ -829,15 +838,50 @@
                     const p = snap.docs.find(d => d.data().estado !== "Rechazado")?.data();
                     
                     if(p) {
+                        // 1. BUSCAR LA PRÓXIMA CUOTA PENDIENTE
+                        const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
+                        
+                        let proximaCuotaMonto = "Al día";
+                        let proximaFecha = "Esperando ciclo";
+                        let colorCaja = "bg-green-50 border-green-200";
+                        let colorTexto = "text-green-800";
+                        let colorLabel = "text-green-700";
+
+                        if (cuotaPendiente) {
+                            // Si tiene cuotas pendientes, mostramos la más vieja (la próxima a pagar)
+                            proximaCuotaMonto = `$${cuotaPendiente.monto.toFixed(2)}`;
+                            proximaFecha = cuotaPendiente.fecha;
+                            colorCaja = "bg-yellow-50 border-yellow-200";
+                            colorTexto = "text-yellow-800";
+                            colorLabel = "text-yellow-700";
+                        } else if (p.tipo === "Abierto") {
+                            // Si está al día, el sistema le proyecta de cuánto será su próximo pago basado en su deuda actual
+                            proximaCuotaMonto = `$${(p.balancePendiente * (p.interesPorcentaje / 100)).toFixed(2)}`;
+                        }
+
+                        // 2. DIBUJAR EL NUEVO DASHBOARD DEL CLIENTE
                         infoP.innerHTML = `
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                                <div><p class="text-sm text-gray-500">Monto Aprobado</p><p class="text-xl font-bold text-gray-800">$${p.montoCapital.toFixed(2)}</p></div>
-                                <div><p class="text-sm text-gray-500">Total a Pagar</p><p class="text-xl font-bold text-gray-800">$${p.totalAPagar.toFixed(2)}</p></div>
-                                <div><p class="text-sm text-gray-500">Balance Pendiente</p><p class="text-xl font-bold text-blue-600">$${p.balancePendiente.toFixed(2)}</p></div>
-                                <div><p class="text-sm text-gray-500">Estado</p><p class="text-lg font-semibold text-green-600">${p.estado}</p></div>
+                                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+                                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Capital Original</p>
+                                    <p class="text-xl font-bold text-gray-800">$${p.montoCapital.toFixed(2)}</p>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+                                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Deuda Pendiente</p>
+                                    <p class="text-xl font-bold text-blue-600">$${p.balancePendiente.toFixed(2)}</p>
+                                </div>
+                                <div class="p-4 ${colorCaja} rounded-xl border shadow-sm transition-colors">
+                                    <p class="text-xs ${colorLabel} font-bold uppercase tracking-wider mb-1">Próxima Cuota</p>
+                                    <p class="text-xl font-bold ${colorTexto}">${proximaCuotaMonto}</p>
+                                </div>
+                                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 shadow-sm">
+                                    <p class="text-xs text-gray-500 font-bold uppercase tracking-wider mb-1">Vencimiento</p>
+                                    <p class="text-lg font-semibold text-gray-800">${proximaFecha}</p>
+                                </div>
                             </div>`;
                         
                         tbCuotas.innerHTML = '';
+                        // ... aquí continúa el p.planDePagos.forEach que ya tienes ...
                         p.planDePagos.forEach(cuota => {
                             let badge = '';
                             let btnImprimir = '';
@@ -898,34 +942,66 @@
             // D. VISTA DEL ADMINISTRADOR (Control Total, Estadísticas y Filtros)
             else if (rol === 'admin') {
                 
-                // 1. LÓGICA DE PAGOS Y FILTRO POR MES (Corregido y separado)
+                // 1. LÓGICA DE PAGOS Y FILTROS AVANZADOS
                 let pagosTotalesAdmin = [];
+                const tipoFiltro = document.getElementById('filtro-tipo-dashboard');
                 const mesInput = document.getElementById('filtro-mes-dashboard');
+                const anioInput = document.getElementById('filtro-anio-dashboard');
                 
-                // Poner el mes actual por defecto al cargar
+                // Configurar valores por defecto (Mes y Año actual)
+                const hoy = new Date();
                 if (mesInput && !mesInput.value) {
-                    const hoy = new Date();
                     mesInput.value = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
                 }
+                if (anioInput && !anioInput.value) {
+                    anioInput.value = hoy.getFullYear();
+                }
 
-                // Función que redibuja los pagos cuando cambias el mes
+                // Cambiar la vista de los inputs según el filtro seleccionado
+                if (tipoFiltro) {
+                    tipoFiltro.addEventListener('change', (e) => {
+                        const tipo = e.target.value;
+                        if (tipo === 'global') {
+                            mesInput.classList.add('hidden');
+                            anioInput.classList.add('hidden');
+                        } else if (tipo === 'anual') {
+                            mesInput.classList.add('hidden');
+                            anioInput.classList.remove('hidden');
+                        } else {
+                            mesInput.classList.remove('hidden');
+                            anioInput.classList.add('hidden');
+                        }
+                        renderizarPagosAdmin(); // Redibujar tabla
+                    });
+                }
+
                 const renderizarPagosAdmin = () => {
                     const tPendientes = document.getElementById('tabla-pagos-admin');
                     const tHistorial = document.getElementById('tabla-historial-pagos-admin');
                     const statCobrado = document.getElementById('stat-cobrado');
-                    const mesSeleccionado = mesInput ? mesInput.value : ''; 
-
+                    
                     if (tPendientes) tPendientes.innerHTML = '';
                     if (tHistorial) tHistorial.innerHTML = '';
                     
-                    let totalCobradoMes = 0;
+                    let totalCobrado = 0;
                     let hayPendientes = false;
+                    
+                    // Leer qué estamos filtrando en este momento
+                    const tipo = tipoFiltro ? tipoFiltro.value : 'mensual';
+                    const mesSeleccionado = mesInput ? mesInput.value : ''; 
+                    const anioSeleccionado = anioInput ? anioInput.value : '';
 
                     pagosTotalesAdmin.forEach(p => {
                         const fechaObj = new Date(p.fechaRegistro);
-                        const mesDelPago = p.fechaRegistro.substring(0, 7); // Formato "YYYY-MM"
-                        const cumpleFiltro = !mesSeleccionado || mesSeleccionado === mesDelPago;
+                        const mesDelPago = p.fechaRegistro.substring(0, 7); // Formato "AAAA-MM"
+                        const anioDelPago = p.fechaRegistro.substring(0, 4); // Formato "AAAA"
                         const fechaBonita = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
+
+                        // LÓGICA DE DECISIÓN DEL FILTRO
+                        let cumpleFiltro = false;
+                        if (tipo === 'global') cumpleFiltro = true;
+                        else if (tipo === 'anual') cumpleFiltro = (anioDelPago === anioSeleccionado);
+                        else cumpleFiltro = (mesDelPago === mesSeleccionado); // mensual
 
                         if (p.estado === "Pendiente de Aprobación") {
                             hayPendientes = true;
@@ -944,8 +1020,9 @@
                             }
                         } 
                         else if (p.estado === "Aprobado" && cumpleFiltro) {
-                            totalCobradoMes += p.montoPagado;
+                            totalCobrado += p.montoPagado;
                             if (tHistorial) {
+                                // AQUI ESTÁ LA CLAVE DEL TICKET: Enviamos la fechaBonita directamente a la función de imprimir
                                 tHistorial.innerHTML += `
                                     <tr class="hover:bg-green-50 transition-colors">
                                         <td class="p-3">${fechaBonita}</td>
@@ -953,7 +1030,7 @@
                                         <td class="p-3 text-xs text-gray-500">${p.cobradorNombre}</td>
                                         <td class="p-3 font-bold text-gray-700">$${p.montoPagado.toFixed(2)}</td>
                                         <td class="p-3 text-center">
-                                            <button onclick="imprimirTicket('${fechaBonita}', '${p.clienteNombre}', ${p.montoPagado}, '${p.cobradorNombre}', false)" class="text-blue-600 hover:text-blue-800 p-1 bg-blue-50 rounded-full transition shadow-sm">
+                                            <button onclick="imprimirTicket('${fechaBonita}', '${p.clienteNombre || 'Cliente'}', ${p.montoPagado}, '${p.cobradorNombre}', false)" class="text-blue-600 hover:text-blue-800 p-1 bg-blue-50 rounded-full transition shadow-sm">
                                                 <i data-lucide="printer" class="w-4 h-4"></i>
                                             </button>
                                         </td>
@@ -962,20 +1039,24 @@
                         }
                     });
 
-                    if (statCobrado) statCobrado.innerText = `$${totalCobradoMes.toFixed(2)}`;
+                    // Actualizar la tarjeta de ganancias según lo filtrado
+                    if (statCobrado) statCobrado.innerText = `$${totalCobrado.toFixed(2)}`;
+                    
+                    // Textos cuando las tablas están vacías
                     if (!hayPendientes && tPendientes) {
                         tPendientes.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">Todo al día. No hay pagos pendientes.</td></tr>`;
                     }
                     if (tHistorial && tHistorial.innerHTML === '') {
-                        tHistorial.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay cobros registrados en este mes.</td></tr>`;
+                        tHistorial.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-400">No hay cobros registrados en este periodo.</td></tr>`;
                     }
-                    lucide.createIcons();
+                    if(typeof lucide !== 'undefined') lucide.createIcons();
                 };
 
-                // Escuchamos cambios en el filtro de mes
+                // Escuchamos si el Admin escribe o cambia la fecha
                 if (mesInput) mesInput.addEventListener('change', renderizarPagosAdmin);
+                if (anioInput) anioInput.addEventListener('input', renderizarPagosAdmin);
 
-                // Escuchamos la base de datos de Pagos
+                // Conexión constante con Firebase
                 onSnapshot(collection(db, "pagos"), (snap) => {
                     pagosTotalesAdmin = [];
                     snap.forEach(d => pagosTotalesAdmin.push({id: d.id, ...d.data()}));
@@ -1291,17 +1372,20 @@
         };
         
         window.cerrarModalPago = () => { document.getElementById('modal-pago').classList.add('hidden'); };
-        // B. Generador de Ticket (Ahora incluye nota de mora y escudo anti-bloqueo)
+
+        // B. Generador de Ticket (Recibo físico o PDF general)
         window.imprimirTicket = (fecha, cliente, monto, cobrador, tieneMora) => {
             const ventanaTicket = window.open('', '_blank', 'width=350,height=500');
             
-            // ESCUDO DE SEGURIDAD: Si el navegador bloqueó la ventana, avisamos al usuario
             if (!ventanaTicket) {
-                alert("⚠️ Tu navegador bloqueó el recibo. Por favor, busca el icono en la barra de direcciones (arriba), permite las ventanas emergentes (pop-ups) para esta página y vuelve a intentarlo.");
+                alert("⚠️ Tu navegador bloqueó el recibo. Por favor, busca el icono en la barra de direcciones (arriba) y permite las ventanas emergentes (pop-ups).");
                 return;
             }
             
             let htmlMora = tieneMora ? `<div style="color: red; text-align: center; font-size: 12px; margin-top: 5px; font-weight: bold;">* Incluye pago de recargos por mora</div>` : '';
+
+            // Aseguramos que imprima la fecha que le mandamos desde la tabla
+            const fechaValida = fecha ? fecha : new Date().toLocaleDateString();
 
             ventanaTicket.document.write(`
                 <html>
@@ -1319,7 +1403,7 @@
                 <body>
                     <h2>LORHELS PRESTA</h2>
                     <div class="info">
-                        <div><span>Fecha:</span> <span>${fecha}</span></div>
+                        <div><span>Recibido el:</span> <span style="font-weight: bold; font-size: 16px;">${fechaValida}</span></div>
                         <div><span>Recibo #:</span> <span>${Math.floor(Math.random() * 90000) + 10000}</span></div>
                         <br>
                         <div><span>Cliente:</span></div>
@@ -1469,95 +1553,168 @@
     const rolActual = document.getElementById('rol-usuario-texto').innerText.toLowerCase();
 
     try {
-        if (rolActual === 'admin') {
-            // --- FLUJO DEL ADMINISTRADOR (AMORTIZACIÓN INMEDIATA) ---
+                if (rolActual === 'admin') {
+                    // 1. Guardar el pago en el historial global
+                    await addDoc(collection(db, "pagos"), {
+                        prestamoId: prestamoId,
+                        clienteNombre: nombreCliente,
+                        cobradorId: auth.currentUser.uid, 
+                        cobradorNombre: "Admin: " + nombreCobrador, 
+                        montoPagado: montoPagado, 
+                        estado: "Aprobado",
+                        fechaRegistro: fechaRegistroSegura
+                    });
 
-            // A. Guardar el pago (Incluimos clienteNombre para el historial)
-            await addDoc(collection(db, "pagos"), {
-                prestamoId: prestamoId,
-                clienteNombre: nombreCliente, // <--- CRUCIAL para el historial
-                cobradorId: auth.currentUser.uid, 
-                cobradorNombre: "Admin: " + nombreCobrador, 
-                montoPagado: montoPagado, 
-                estado: "Aprobado",
-                fechaRegistro: fechaRegistroSegura
-            });
+                    // 2. Amortizar y Recalcular
+                    const pref = doc(db, "prestamos", prestamoId);
+                    const pDoc = await getDoc(pref);
+                    
+                    if (pDoc.exists()) {
+                        const datos = pDoc.data();
+                        let nBalance = datos.balancePendiente - montoPagado;
+                        if (nBalance < 0) nBalance = 0;
 
-            // B. Actualizar el Préstamo
-            const pref = doc(db, "prestamos", prestamoId);
-            const pDoc = await getDoc(pref);
-            
-            if (pDoc.exists()) {
-                const datos = pDoc.data();
-                let nBalance = datos.balancePendiente - montoPagado;
-                if (nBalance < 0) nBalance = 0;
+                        let planActualizado = [...datos.planDePagos];
+                        let sobrante = montoPagado;
 
-                let planActualizado = [...datos.planDePagos];
-                let sobrante = montoPagado;
+                        // PASO A: Tachamos cuotas y registramos ABONOS o PAGOS TOTALES
+                        for (let i = 0; i < planActualizado.length; i++) {
+                            if (planActualizado[i].estado === "Pendiente") {
+                                if (sobrante <= 0.01) break; // Freno exacto
 
-                // Tachamos cuotas y registramos FECHA REAL DE COBRO
-                for (let i = 0; i < planActualizado.length; i++) {
-                    if (planActualizado[i].estado === "Pendiente") {
-                        if (sobrante >= planActualizado[i].monto) {
-                            sobrante -= planActualizado[i].monto;
-                            planActualizado[i].estado = "Pagado";
-                            planActualizado[i].fechaPagoReal = fechaBonita; // <--- AUDITORÍA
-                        } else {
-                            planActualizado[i].monto -= sobrante;
-                            sobrante = 0;
-                            break;
+                                let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
+                                let sobranteRed = Math.round(sobrante * 100) / 100;
+
+                                if (sobranteRed >= montoCuota) {
+                                    sobrante -= planActualizado[i].monto;
+                                    planActualizado[i].estado = "Pagado";
+                                    planActualizado[i].fechaPagoReal = fechaBonita; // Pago Completo
+                                } else {
+                                    planActualizado[i].monto -= sobrante;
+                                    planActualizado[i].ultimoAbono = fechaBonita;   // Abono Parcial
+                                    sobrante = 0;
+                                    break;
+                                }
+                            }
                         }
+
+                        // PASO B: Abono a Capital (Préstamo Abierto) o abono a cuotas finales (Fijas)
+                        let nuevoCapital = datos.montoCapital;
+                        if (datos.tipo === "Abierto" && sobrante > 0) {
+                            nuevoCapital -= sobrante;
+                            if (nuevoCapital < 0) nuevoCapital = 0;
+                        } else if (datos.tipo === "Cuotas" && sobrante > 0) {
+                            for (let i = planActualizado.length - 1; i >= 0; i--) {
+                                if (planActualizado[i].estado === "Pendiente") {
+                                    if (sobrante <= 0.01) break;
+                                    let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
+                                    let sobranteRed = Math.round(sobrante * 100) / 100;
+
+                                    if (sobranteRed >= montoCuota) {
+                                        sobrante -= planActualizado[i].monto;
+                                        planActualizado[i].monto = 0;
+                                        planActualizado[i].estado = "Pagado";
+                                        planActualizado[i].fechaPagoReal = fechaBonita;
+                                    } else {
+                                        planActualizado[i].monto -= sobrante;
+                                        sobrante = 0;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        // PASO C: 🧠 REORGANIZACIÓN Y RECÁLCULO EN CASCADA (Efecto Dominó)
+                        if (datos.tipo === "Abierto") {
+                            // Empezamos la simulación con el capital limpio (o reducido si hubo abono)
+                            let deudaSimulada = nuevoCapital;
+
+                            for (let i = 0; i < planActualizado.length; i++) {
+                                if (planActualizado[i].estado === "Pendiente") {
+                                    
+                                    if (planActualizado[i].ultimoAbono) {
+                                        // Si la cuota ya recibió un abono parcial, NO le cambiamos la matemática.
+                                        // Solo sumamos lo que quedó de ella a la deuda arrastrada.
+                                        deudaSimulada += planActualizado[i].monto;
+                                    } else {
+                                        // Si la cuota está intacta, re-escribimos su futuro basándonos en la deuda real.
+                                        let nuevoInteres = deudaSimulada * (datos.interesPorcentaje / 100);
+                                        nuevoInteres = Math.round(nuevoInteres * 100) / 100;
+                                        
+                                        planActualizado[i].monto = nuevoInteres;
+                                        deudaSimulada += nuevoInteres;
+                                    }
+                                }
+                            }
+                            // El balance global se ajusta a la perfección con la suma de la simulación
+                            nBalance = deudaSimulada;
+                        }
+
+                        // PASO D: 🔮 PROYECTAR SIEMPRE LA PRÓXIMA CUOTA (Para Préstamos Abiertos)
+                        if (datos.tipo === "Abierto" && nBalance > 0) {
+                            let ultimaCuota = planActualizado[planActualizado.length - 1];
+                            
+                            // Si la última cuota de la lista ya está pagada, generamos la del mes/semana siguiente
+                            if (ultimaCuota.estado === "Pagado") {
+                                let f = new Date(ultimaCuota.fecha + 'T12:00:00');
+                                if (datos.frecuencia === 'Diario') f.setDate(f.getDate() + 1);
+                                else if (datos.frecuencia === 'Semanal') f.setDate(f.getDate() + 7);
+                                else if (datos.frecuencia === 'Quincenal') f.setDate(f.getDate() + 15);
+                                else if (datos.frecuencia === 'Mensual') f.setMonth(f.getMonth() + 1);
+                                
+                                // El nuevo interés se calcula en base al capital restante
+                                let nuevoInteres = nuevoCapital * (datos.interesPorcentaje / 100);
+                                nuevoInteres = Math.round(nuevoInteres * 100) / 100;
+                                
+                                planActualizado.push({
+                                    cuota: planActualizado.length + 1,
+                                    fecha: f.toISOString().split('T')[0],
+                                    monto: nuevoInteres,
+                                    estado: "Pendiente",
+                                    esInteresAbierto: true
+                                });
+                                
+                                // Sumamos la cuota recién proyectada al balance global del cliente
+                                nBalance += nuevoInteres;
+                            }
+                        }
+
+                        // 3. Guardar cambios en Firebase
+                        await updateDoc(pref, {
+                            balancePendiente: nBalance,
+                            montoCapital: nuevoCapital,
+                            planDePagos: planActualizado,
+                            estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
+                        });
+                    }
+
+                    cerrarModalPago();
+                    
+                    if (confirm("¡Cobro directo procesado! ¿Deseas IMPRIMIR el recibo?")) {
+                        imprimirTicket(fechaBonita, nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
+                    }
+                    if (confirm("¿Deseas enviarlo por WHATSAPP?")) {
+                        enviarWhatsApp(prestamoId, montoPagado, nombreCliente, "Admin: " + nombreCobrador, tieneMora);
+                    }
+
+                } else {
+                    // FLUJO DEL COBRADOR (Se mantiene igual, solo espera aprobación)
+                    await addDoc(collection(db, "pagos"), {
+                        prestamoId: prestamoId,
+                        clienteNombre: nombreCliente,
+                        cobradorId: auth.currentUser.uid, 
+                        cobradorNombre: nombreCobrador,
+                        montoPagado: montoPagado, 
+                        estado: "Pendiente de Aprobación", 
+                        fechaRegistro: fechaRegistroSegura
+                    });
+                    cerrarModalPago();
+                    if (confirm("¡Pago registrado! ¿Deseas IMPRIMIR un Ticket provisional?")) {
+                        imprimirTicket(fechaBonita, nombreCliente, montoPagado, nombreCobrador, tieneMora);
                     }
                 }
-
-                // LÓGICA DE ABONO A CAPITAL (Si es préstamo abierto y sobra dinero)
-                let nuevoCapital = datos.montoCapital;
-                if (datos.tipo === "Abierto" && sobrante > 0) {
-                    nuevoCapital -= sobrante;
-                    if (nuevoCapital < 0) nuevoCapital = 0;
-                }
-
-                await updateDoc(pref, {
-                    balancePendiente: nBalance,
-                    montoCapital: nuevoCapital, // <--- ABONO A CAPITAL
-                    planDePagos: planActualizado,
-                    estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
-                });
-            }
-
-            cerrarModalPago();
-            
-            if (confirm("¡Cobro aprobado! ¿Deseas IMPRIMIR el recibo?")) {
-                imprimirTicket(fechaBonita, nombreCliente, montoPagado, "Admin: " + nombreCobrador, tieneMora);
-            }
-            if (confirm("¿Deseas enviarlo por WHATSAPP?")) {
-                enviarWhatsApp(prestamoId, montoPagado, nombreCliente, "Admin: " + nombreCobrador, tieneMora);
-            }
-
-        } else {
-            // --- FLUJO DEL COBRADOR (ESPERA APROBACIÓN) ---
-            await addDoc(collection(db, "pagos"), {
-                prestamoId: prestamoId,
-                clienteNombre: nombreCliente, // <--- Para que el Admin lo vea en la lista
-                cobradorId: auth.currentUser.uid, 
-                cobradorNombre: nombreCobrador,
-                montoPagado: montoPagado, 
-                estado: "Pendiente de Aprobación", 
-                fechaRegistro: fechaRegistroSegura
-            });
-            
-            cerrarModalPago();
-            
-            if (confirm("¡Pago enviado a revisión! ¿Deseas imprimir un ticket provisional?")) {
-                imprimirTicket(fechaBonita, nombreCliente, montoPagado, nombreCobrador, tieneMora);
-            }
-        }
-    } catch (error) { 
-        alert("Error al procesar pago: " + error.message); 
-    } finally { 
-        btnSubmit.disabled = false; 
-        btnSubmit.innerText = "Procesar Pago"; 
-    }
+            } catch (error) { alert("Error al procesar pago: " + error.message); } 
+            finally { btnSubmit.disabled = false; btnSubmit.innerText = "Procesar Pago"; }
 });
 
         // D. Administrador: Aprobar / Rechazar Operaciones
@@ -1571,26 +1728,17 @@
             if(confirm("¿Rechazar este pago?")) await updateDoc(doc(db, "pagos", id), { estado: "Rechazado" }); 
         };
 
-        // ¡MAGIA AVANZADA! Aprobar pago desde el Dashboard (Con sincronización de fechas reales y redondeo)
+        // ¡MAGIA AVANZADA! Aprobar pago desde el Dashboard (Con recálculo del futuro)
         window.aprobarPago = async (idPago, prestamoId, montoPagado) => {
-            if (!confirm(`¿Aprobar pago de $${montoPagado}? El sistema amortizará la cuota con la fecha real del cobro.`)) return;
-            
+            if (!confirm(`¿Aprobar pago de $${montoPagado}? El sistema recalculará el préstamo automáticamente.`)) return;
             try {
-                // 1. OBTENER EL RECIBO DE PAGO (Para extraer la fecha en la que el cobrador recibió el dinero)
                 const pagoRef = doc(db, "pagos", idPago);
                 const pagoDoc = await getDoc(pagoRef);
+                if (!pagoDoc.exists()) return alert("Error: Recibo no encontrado.");
                 
-                if (!pagoDoc.exists()) {
-                    alert("❌ Error: No se encontró el recibo en la base de datos.");
-                    return;
-                }
-                
-                // Extraemos la fecha exacta del recibo (Ej: 2025-11-27) y le damos formato bonito
-                const datosPago = pagoDoc.data();
-                const fechaObj = new Date(datosPago.fechaRegistro);
+                const fechaObj = new Date(pagoDoc.data().fechaRegistro);
                 const fechaRealDelCobro = `${fechaObj.getDate().toString().padStart(2,'0')}/${(fechaObj.getMonth()+1).toString().padStart(2,'0')}/${fechaObj.getFullYear()}`;
 
-                // 2. OBTENER EL PRÉSTAMO Y AMORTIZAR
                 const pref = doc(db, "prestamos", prestamoId);
                 const pDoc = await getDoc(pref);
                 
@@ -1602,26 +1750,28 @@
                     let planActualizado = [...datos.planDePagos];
                     let sobrante = montoPagado;
 
-                    // PASO A: Cubrir la cuota ACTUAL pendiente
+                    // PASO A: Tachamos o abonamos
                     for (let i = 0; i < planActualizado.length; i++) {
                         if (planActualizado[i].estado === "Pendiente") {
-                            // Usamos Math.round para evitar fallos de centavos en Javascript
-                            let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
-                            let sobranteRedondeado = Math.round(sobrante * 100) / 100;
+                            if (sobrante <= 0.01) break;
 
-                            if (sobranteRedondeado >= montoCuota) {
+                            let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
+                            let sobranteRed = Math.round(sobrante * 100) / 100;
+
+                            if (sobranteRed >= montoCuota) {
                                 sobrante -= planActualizado[i].monto;
                                 planActualizado[i].estado = "Pagado";
-                                planActualizado[i].fechaPagoReal = fechaRealDelCobro; // <-- ¡La fecha del Cobrador!
+                                planActualizado[i].fechaPagoReal = fechaRealDelCobro; 
                             } else {
                                 planActualizado[i].monto -= sobrante;
+                                planActualizado[i].ultimoAbono = fechaRealDelCobro;
                                 sobrante = 0;
                                 break;
                             }
                         }
                     }
 
-                    // PASO B: Abono a Capital / Descuento extra
+                    // PASO B: Abono a Capital
                     let nuevoCapital = datos.montoCapital;
                     if (datos.tipo === "Abierto" && sobrante > 0) {
                         nuevoCapital -= sobrante;
@@ -1629,13 +1779,14 @@
                     } else if (datos.tipo === "Cuotas" && sobrante > 0) {
                         for (let i = planActualizado.length - 1; i >= 0; i--) {
                             if (planActualizado[i].estado === "Pendiente") {
+                                if (sobrante <= 0.01) break;
                                 let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
-                                let sobranteRedondeado = Math.round(sobrante * 100) / 100;
+                                let sobranteRed = Math.round(sobrante * 100) / 100;
 
-                                if (sobranteRedondeado >= montoCuota) {
+                                if (sobranteRed >= montoCuota) {
                                     sobrante -= planActualizado[i].monto;
                                     planActualizado[i].monto = 0;
-                                    planActualizado[i].estado = "Pagado"; 
+                                    planActualizado[i].estado = "Pagado";
                                     planActualizado[i].fechaPagoReal = fechaRealDelCobro;
                                 } else {
                                     planActualizado[i].monto -= sobrante;
@@ -1646,7 +1797,53 @@
                         }
                     }
 
-                    // 3. ACTUALIZAR PRÉSTAMO EN FIREBASE
+                    // PASO C: 🧠 REORGANIZACIÓN Y RECÁLCULO EN CASCADA (Efecto Dominó)
+                    if (datos.tipo === "Abierto") {
+                        let deudaSimulada = nuevoCapital;
+
+                        for (let i = 0; i < planActualizado.length; i++) {
+                            if (planActualizado[i].estado === "Pendiente") {
+                                
+                                if (planActualizado[i].ultimoAbono) {
+                                    deudaSimulada += planActualizado[i].monto;
+                                } else {
+                                    let nuevoInteres = deudaSimulada * (datos.interesPorcentaje / 100);
+                                    nuevoInteres = Math.round(nuevoInteres * 100) / 100;
+                                    
+                                    planActualizado[i].monto = nuevoInteres;
+                                    deudaSimulada += nuevoInteres;
+                                }
+                            }
+                        }
+                        nBalance = deudaSimulada; 
+                    }
+
+                    // PASO D: 🔮 PROYECTAR SIEMPRE LA PRÓXIMA CUOTA (Para Préstamos Abiertos)
+                    if (datos.tipo === "Abierto" && nBalance > 0) {
+                        let ultimaCuota = planActualizado[planActualizado.length - 1];
+                        
+                        if (ultimaCuota.estado === "Pagado") {
+                            let f = new Date(ultimaCuota.fecha + 'T12:00:00');
+                            if (datos.frecuencia === 'Diario') f.setDate(f.getDate() + 1);
+                            else if (datos.frecuencia === 'Semanal') f.setDate(f.getDate() + 7);
+                            else if (datos.frecuencia === 'Quincenal') f.setDate(f.getDate() + 15);
+                            else if (datos.frecuencia === 'Mensual') f.setMonth(f.getMonth() + 1);
+                            
+                            let nuevoInteres = nuevoCapital * (datos.interesPorcentaje / 100);
+                            nuevoInteres = Math.round(nuevoInteres * 100) / 100;
+                            
+                            planActualizado.push({
+                                cuota: planActualizado.length + 1,
+                                fecha: f.toISOString().split('T')[0],
+                                monto: nuevoInteres,
+                                estado: "Pendiente",
+                                esInteresAbierto: true
+                            });
+                            
+                            nBalance += nuevoInteres;
+                        }
+                    }
+
                     await updateDoc(pref, {
                         balancePendiente: nBalance,
                         montoCapital: nuevoCapital,
@@ -1654,14 +1851,10 @@
                         estado: nBalance <= 0 ? "Pagado Completamente" : datos.estado
                     });
                     
-                    // 4. FINALMENTE, MARCAR EL RECIBO COMO APROBADO
                     await updateDoc(pagoRef, { estado: "Aprobado" });
-                    
-                    alert("✅ Pago aprobado exitosamente. La cuota se registró con la fecha real del cobrador.");
+                    alert("✅ Pago aprobado y procesado correctamente.");
                 }
-            } catch (error) { 
-                alert("Error crítico: " + error.message); 
-            }
+            } catch (error) { alert("Error: " + error.message); }
         };
 
         // ============================================================================
@@ -1779,7 +1972,7 @@
             });
         }
 
-        // B. Función Maestra: Verificar y Aplicar Recargos
+        // B. Función Maestra: Verificar, Aplicar Recargos y Proyectar Cuotas
         async function verificarYAplicarMoras() {
             const ajustesSnap = await getDoc(doc(db, "ajustes", "mora"));
             if (!ajustesSnap.exists()) return;
@@ -1796,7 +1989,7 @@
                 let huboCambios = false;
                 let acumuladoBalance = 0;
 
-                // --- PARTE A: MORAS ---
+                // --- PARTE A: APLICAR MORAS POR ATRASO ---
                 planActualizado.forEach((cuota) => {
                     const fechaCuota = new Date(cuota.fecha + 'T12:00:00');
                     const diffDias = Math.floor((hoy - fechaCuota) / (1000 * 60 * 60 * 24));
@@ -1810,12 +2003,11 @@
                     }
                 });
 
-                // --- PARTE B: GENERACIÓN MÚLTIPLE (INTERÉS COMPUESTO EN RÉDITO) ---
+                // --- PARTE B: EL CEREBRO DE PRÉSTAMOS ABIERTOS (PROYECCIÓN E INTERÉS COMPUESTO) ---
                 if (p.tipo === "Abierto") {
                     let ultimaCuota = planActualizado[planActualizado.length - 1];
                     let fechaSiguiente = new Date(ultimaCuota.fecha + 'T12:00:00');
                     
-                    // Función para sumar tiempo según frecuencia
                     const sumarPeriodo = (fecha) => {
                         let f = new Date(fecha);
                         if (p.frecuencia === 'Diario') f.setDate(f.getDate() + 1);
@@ -1825,32 +2017,42 @@
                         return f;
                     };
 
-                    fechaSiguiente = sumarPeriodo(fechaSiguiente);
+                    // 1. PROYECCIÓN OBLIGATORIA: Si el cliente pagó todo, le mostramos su próximo compromiso
+                    if (ultimaCuota.estado === "Pagado" && p.balancePendiente > 0) {
+                        fechaSiguiente = sumarPeriodo(fechaSiguiente);
+                        let nuevoInteres = p.montoCapital * (p.interesPorcentaje / 100);
+                        
+                        planActualizado.push({
+                            cuota: planActualizado.length + 1,
+                            fecha: fechaSiguiente.toISOString().split('T')[0],
+                            monto: Math.round(nuevoInteres * 100) / 100,
+                            estado: "Pendiente",
+                            esInteresAbierto: true
+                        });
+                        huboCambios = true;
+                        
+                        // Actualizamos la variable para que el siguiente paso sepa que hay una nueva cuota
+                        ultimaCuota = planActualizado[planActualizado.length - 1];
+                        fechaSiguiente = new Date(ultimaCuota.fecha + 'T12:00:00');
+                    }
 
-                    // Bucle para generar todas las cuotas faltantes hasta hoy
+                    // 2. INTERÉS COMPUESTO: Si el tiempo siguió pasando y el cliente no pagó nada
+                    fechaSiguiente = sumarPeriodo(fechaSiguiente);
                     while (hoy >= fechaSiguiente) {
                         const nuevaFechaStr = fechaSiguiente.toISOString().split('T')[0];
-                        
-                        // 🧠 LA MAGIA DEL INTERÉS COMPUESTO:
-                        // Calculamos la deuda total en este exacto momento.
-                        // p.balancePendiente trae la deuda hasta hoy, y acumuladoBalance trae lo que le hemos sumado en este mismo proceso.
                         let deudaActual = p.balancePendiente + acumuladoBalance;
-                        
-                        // El nuevo interés se calcula sobre TODO lo adeudado, no sobre el monto original.
                         const nuevoInteres = deudaActual * (p.interesPorcentaje / 100);
                         
                         planActualizado.push({
                             cuota: planActualizado.length + 1,
                             fecha: nuevaFechaStr,
-                            monto: nuevoInteres,
+                            monto: Math.round(nuevoInteres * 100) / 100,
                             estado: "Pendiente",
                             esInteresAbierto: true
                         });
 
                         acumuladoBalance += nuevoInteres;
                         huboCambios = true;
-                        
-                        // Avanzamos a la siguiente fecha
                         fechaSiguiente = sumarPeriodo(fechaSiguiente);
                     }
                 }
@@ -1876,7 +2078,7 @@
         }
 
         // ============================================================================
-        // 11. VISUALIZADOR DE HISTORIAL DE PAGOS (Con botón de Reimpresión)
+        // 11. VISUALIZADOR DE HISTORIAL DE PAGOS (Con botón de Reimpresión y WhatsApp)
         // ============================================================================
         window.abrirModalHistorial = async (prestamoId) => {
             const modal = document.getElementById('modal-historial');
@@ -1901,40 +2103,73 @@
                     titulo.innerText = `Historial de: ${p.nombreCliente}`;
                     tbody.innerHTML = '';
                     
+                    // --- MAGIA NUEVA: INYECTAR BOTÓN DE WHATSAPP EN EL FOOTER DEL MODAL ---
+                    const footerModal = document.querySelector('#modal-historial .mt-4.flex.justify-end');
+                    if (footerModal) {
+                        footerModal.innerHTML = `
+                            <button onclick="enviarEstadoWhatsApp('${prestamoId}')" id="btn-wa-estado" class="px-4 py-2 bg-green-500 text-white hover:bg-green-600 rounded-lg transition font-medium flex items-center mr-3 shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                                Enviar Estado
+                            </button>
+                            <button onclick="cerrarModalHistorial()" class="px-4 py-2 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-lg transition font-medium shadow-sm">Cerrar</button>
+                        `;
+                    }
+                    // ----------------------------------------------------------------------
+
                     if (!p.planDePagos || p.planDePagos.length === 0) {
                         tbody.innerHTML = `<tr><td colspan="4" class="p-4 text-center text-gray-500">No hay cuotas registradas.</td></tr>`;
                         return;
                     }
 
+                    // Ocultamos la cabecera de la tabla en celulares
+                    document.querySelector('#modal-historial thead').className = "hidden sm:table-header-group";
+
                     p.planDePagos.forEach(cuota => {
                         let badge = '';
                         let btnImprimir = '';
+                        let fPagoReal = '<span class="text-gray-300">---</span>'; 
+
                         const nombreCuota = cuota.esInteresAbierto ? `Interés ${cuota.cuota}` : `Cuota ${cuota.cuota}`;
                         const nombreLimpio = p.nombreCliente.replace(/'/g, "\\'");
                         const fVencimiento = cuota.fecha;
 
                         if (cuota.estado === 'Pagado') {
                             badge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs">Pagado</span>';
-                            // Extraemos la fecha de pago real (o ponemos N/A si fue un pago viejo antes de esta actualización)
-                            const fPagoRealImpresion = cuota.fechaPagoReal ? cuota.fechaPagoReal : 'N/A';
-                            
-                            // Pasamos fPagoRealImpresion a la función
-                            btnImprimir = `<button onclick="imprimirComprobanteCliente('${nombreLimpio}', ${cuota.cuota}, '${cuota.fecha}', '${fPagoRealImpresion}', ${cuota.monto})" class="ml-2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1 rounded-full inline-flex items-center justify-center" title="Reimprimir Recibo"><i data-lucide="printer" class="w-4 h-4"></i></button>`;
-                        } else {
+                            fPagoReal = cuota.fechaPagoReal ? cuota.fechaPagoReal : 'N/A';
+                            btnImprimir = `<button onclick="imprimirComprobanteCliente('${nombreLimpio}', ${cuota.cuota}, '${cuota.fecha}', '${fPagoReal}', ${cuota.monto})" class="ml-2 text-blue-500 hover:text-blue-700 bg-blue-50 p-1.5 rounded-full inline-flex items-center justify-center shadow-sm" title="Reimprimir Recibo"><i data-lucide="printer" class="w-4 h-4"></i></button>`;
+                        } 
+                        else if (cuota.ultimoAbono) {
+                            badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Abono</span>';
+                            fPagoReal = `<span class="text-blue-600 font-bold" title="Último abono realizado">Abono: ${cuota.ultimoAbono}</span>`;
+                        } 
+                        else {
                             badge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs">Pendiente</span>';
                         }
                         
-                        const fPagoReal = cuota.fechaPagoReal ? cuota.fechaPagoReal : '<span class="text-gray-300">---</span>';
-
                         tbody.innerHTML += `
-                            <tr class="hover:bg-gray-50 text-xs">
-                                <td class="p-3 font-medium text-gray-800">${nombreCuota}</td>
-                                <td class="p-3 text-red-500">${fVencimiento}</td>
-                                <td class="p-3 text-green-600 font-bold">${fPagoReal}</td>
-                                <td class="p-3 font-semibold">$${cuota.monto.toFixed(2)}</td>
-                                <td class="p-3 text-center flex items-center justify-center">${badge} ${btnImprimir}</td>
+                            <tr class="flex flex-col sm:table-row mb-4 sm:mb-0 border border-gray-200 sm:border-none rounded-xl sm:rounded-none p-3 sm:p-0 bg-white sm:hover:bg-gray-50 shadow-sm sm:shadow-none text-sm sm:text-xs">
+                                <td class="flex justify-between items-center sm:table-cell p-2 sm:p-3 border-b border-gray-50 sm:border-none">
+                                    <span class="sm:hidden font-bold text-gray-500 uppercase text-xs">Detalle</span>
+                                    <span class="font-bold sm:font-medium text-gray-800">${nombreCuota}</span>
+                                </td>
+                                <td class="flex justify-between items-center sm:table-cell p-2 sm:p-3 border-b border-gray-50 sm:border-none">
+                                    <span class="sm:hidden font-bold text-gray-500 uppercase text-xs">Vencimiento</span>
+                                    <span class="text-red-500 font-medium">${fVencimiento}</span>
+                                </td>
+                                <td class="flex justify-between items-center sm:table-cell p-2 sm:p-3 border-b border-gray-50 sm:border-none">
+                                    <span class="sm:hidden font-bold text-gray-500 uppercase text-xs">Recibido</span>
+                                    <span class="text-green-600 font-bold">${fPagoReal}</span>
+                                </td>
+                                <td class="flex justify-between items-center sm:table-cell p-2 sm:p-3 border-b border-gray-50 sm:border-none">
+                                    <span class="sm:hidden font-bold text-gray-500 uppercase text-xs">Monto</span>
+                                    <span class="font-bold text-gray-900">$${cuota.monto.toFixed(2)}</span>
+                                </td>
+                                <td class="flex justify-between items-center sm:table-cell p-2 sm:p-3 sm:text-center bg-gray-50 sm:bg-transparent rounded-b-lg mt-1 sm:mt-0">
+                                    <span class="sm:hidden font-bold text-gray-500 uppercase text-xs">Estado</span>
+                                    <div class="flex items-center space-x-2">${badge} ${btnImprimir}</div>
+                                </td>
                             </tr>
-                    `;
+                        `;
                     });
                     
                     if(typeof lucide !== 'undefined') lucide.createIcons();
@@ -1952,6 +2187,81 @@
         window.cerrarModalHistorial = () => {
             const modal = document.getElementById('modal-historial');
             if (modal) modal.classList.add('hidden');
+        };
+
+        // --- NUEVO: FUNCIÓN PARA ENVIAR ESTADO DE CUENTA POR WHATSAPP ---
+        window.enviarEstadoWhatsApp = async (prestamoId) => {
+            const btn = document.getElementById('btn-wa-estado');
+            if(btn) { btn.disabled = true; btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mr-2"></i> Generando...'; if(typeof lucide !== 'undefined') lucide.createIcons(); }
+
+            // TRUCO ANTI-BLOQUEO: Abrimos la pestaña vacía de inmediato
+            const ventanaWhatsApp = window.open('about:blank', '_blank');
+            if (!ventanaWhatsApp) {
+                alert("⚠️ Tu navegador bloqueó la ventana. Por favor permite las ventanas emergentes.");
+                if(btn) { btn.disabled = false; btn.innerHTML = 'Enviar Estado'; }
+                return;
+            }
+
+            try {
+                // 1. Obtener datos del préstamo
+                const prestamoSnap = await getDoc(doc(db, "prestamos", prestamoId));
+                if (!prestamoSnap.exists()) {
+                    ventanaWhatsApp.close();
+                    return;
+                }
+                const p = prestamoSnap.data();
+
+                // 2. Obtener el teléfono del cliente
+                const clienteSnap = await getDoc(doc(db, "clientes", p.clienteId));
+                if (!clienteSnap.exists()) {
+                    ventanaWhatsApp.close();
+                    alert("No se encontró el perfil del cliente para obtener su teléfono.");
+                    return;
+                }
+                let telefono = clienteSnap.data().telefono.replace(/\D/g,'');
+                if (telefono.length === 10) telefono = "1" + telefono; // Código de país RD
+
+                // 3. Buscar la próxima cuota a pagar
+                const cuotaPendiente = p.planDePagos.find(c => c.estado === "Pendiente");
+                let proximaCuotaTexto = "Al día";
+                let fechaTexto = "Esperando ciclo";
+
+                if (cuotaPendiente) {
+                    proximaCuotaTexto = `$${cuotaPendiente.monto.toFixed(2)}`;
+                    fechaTexto = cuotaPendiente.fecha;
+                } else if (p.tipo === "Abierto" && p.balancePendiente > 0) {
+                    proximaCuotaTexto = `$${(p.balancePendiente * (p.interesPorcentaje / 100)).toFixed(2)}`;
+                }
+
+                // 4. Diseñar el mensaje
+                let mensaje = `*LORHELS PRESTA - ESTADO DE CUENTA* 📊\n\n`;
+                mensaje += `Hola *${p.nombreCliente}*, te enviamos el resumen actual de tu préstamo:\n\n`;
+                mensaje += `💵 *Capital Original:* $${p.montoCapital.toFixed(2)}\n`;
+                mensaje += `📉 *Deuda Pendiente:* $${p.balancePendiente.toFixed(2)}\n\n`;
+                
+                if (p.balancePendiente > 0) {
+                    mensaje += `👉 *Próxima Cuota:* ${proximaCuotaTexto}\n`;
+                    mensaje += `📅 *Vencimiento:* ${fechaTexto}\n\n`;
+                } else {
+                    mensaje += `✅ *Estado:* Préstamo Saldado. ¡Gracias!\n\n`;
+                }
+                
+                mensaje += `_Para más detalles de tus pagos, accede a tu portal de cliente._`;
+
+                // 5. Enviar a la URL
+                const urlWhatsApp = `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(mensaje)}`;
+                ventanaWhatsApp.location.href = urlWhatsApp;
+
+            } catch (error) {
+                ventanaWhatsApp.close();
+                console.error("Error al enviar WhatsApp:", error);
+                alert("Hubo un error al generar el mensaje.");
+            } finally {
+                if(btn) { 
+                    btn.disabled = false; 
+                    btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> Enviar Estado`;
+                }
+            }
         };
         
     </script>
