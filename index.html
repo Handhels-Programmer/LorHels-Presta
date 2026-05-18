@@ -1578,9 +1578,20 @@
                         let sobrante = montoPagado;
 
                         // PASO A: Tachamos cuotas y registramos ABONOS o PAGOS TOTALES
+                        const fPagoLimpo = new Date(fechaInput + 'T12:00:00'); // Convertimos la fecha de cobro a un formato seguro
+
                         for (let i = 0; i < planActualizado.length; i++) {
                             if (planActualizado[i].estado === "Pendiente") {
                                 if (sobrante <= 0.01) break; // Freno exacto
+
+                                // 🛑 REGLA DE ORO PARA PRÉSTAMOS ABIERTOS:
+                                // No cobrar intereses adelantados. Si la cuota es del futuro, rompemos el ciclo para que el sobrante vaya a CAPITAL.
+                                if (datos.tipo === "Abierto") {
+                                    const fCuota = new Date(planActualizado[i].fecha + 'T12:00:00');
+                                    if (fCuota > fPagoLimpo) {
+                                        break; 
+                                    }
+                                }
 
                                 let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
                                 let sobranteRed = Math.round(sobrante * 100) / 100;
@@ -1751,9 +1762,20 @@
                     let sobrante = montoPagado;
 
                     // PASO A: Tachamos o abonamos
+                    const fPagoStr = pagoDoc.data().fechaRegistro.substring(0, 10);
+                    const fPagoLimpo = new Date(fPagoStr + 'T12:00:00');
+
                     for (let i = 0; i < planActualizado.length; i++) {
                         if (planActualizado[i].estado === "Pendiente") {
                             if (sobrante <= 0.01) break;
+
+                            // 🛑 REGLA DE ORO PARA PRÉSTAMOS ABIERTOS:
+                            if (datos.tipo === "Abierto") {
+                                const fCuota = new Date(planActualizado[i].fecha + 'T12:00:00');
+                                if (fCuota > fPagoLimpo) {
+                                    break; 
+                                }
+                            }
 
                             let montoCuota = Math.round(planActualizado[i].monto * 100) / 100;
                             let sobranteRed = Math.round(sobrante * 100) / 100;
